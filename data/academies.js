@@ -117,7 +117,7 @@ export const ACADEMIES = [
     },
 
     {
-        id: "fighting_n  erds",
+        id: "fighting_nerds",
         name: "Fighting Nerds",
         shortName: "Fighting Nerds",
         country: "BRA",
