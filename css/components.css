@@ -1,1 +1,757 @@
-/* Component Styles */
+/* ============================================================
+   MMA DESTINY
+   COMPONENTS.CSS
+   ============================================================ */
+
+
+/* ============================================================
+   BOTÕES
+   ============================================================ */
+
+.gold-button {
+
+    width: 100%;
+
+    min-height: 50px;
+
+    padding: 12px 18px;
+
+    background:
+        linear-gradient(
+            180deg,
+            var(--gold-light),
+            var(--gold)
+        );
+
+    color: #0a0a0a;
+
+    border-radius: var(--radius);
+
+    font-family: var(--font-display);
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+    transition:
+        filter var(--transition),
+        transform var(--transition);
+
+}
+
+
+.gold-button:hover {
+
+    filter: brightness(1.08);
+
+}
+
+
+.gold-button:active {
+
+    transform: scale(0.99);
+
+}
+
+
+.secondary-button {
+
+    width: 100%;
+
+    min-height: 44px;
+
+    padding: 10px 14px;
+
+    background: #151515;
+
+    color: var(--silver);
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius-small);
+
+    font-family: var(--font-display);
+
+    font-size: 13px;
+
+    letter-spacing: 1px;
+
+}
+
+
+.secondary-button:hover {
+
+    border-color: var(--gold-dark);
+
+    color: var(--gold);
+
+}
+
+
+.icon-button {
+
+    width: 38px;
+
+    height: 38px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    border: 1px solid var(--border);
+
+    background: #121212;
+
+    color: var(--silver);
+
+    font-size: 18px;
+
+}
+
+
+/* ============================================================
+   FORMULÁRIOS
+   ============================================================ */
+
+.creation-container {
+
+    padding: 16px;
+
+    padding-bottom: 35px;
+
+}
+
+
+.form-card {
+
+    padding: 16px;
+
+    margin-bottom: 12px;
+
+    background: var(--panel);
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius);
+
+}
+
+
+.card-title {
+
+    margin-bottom: 16px;
+
+    padding-bottom: 9px;
+
+    border-bottom: 1px solid #242424;
+
+    color: var(--gold);
+
+    font-family: var(--font-display);
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: 1.5px;
+
+}
+
+
+.form-group {
+
+    margin-bottom: 13px;
+
+}
+
+
+.form-group:last-child {
+
+    margin-bottom: 0;
+
+}
+
+
+.form-group label {
+
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: var(--gray);
+
+    font-family: var(--font-display);
+
+    font-size: 10px;
+
+    font-weight: 600;
+
+    letter-spacing: 1px;
+
+}
+
+
+.form-group input,
+.form-group select {
+
+    width: 100%;
+
+    height: 44px;
+
+    padding: 0 12px;
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius-small);
+
+    background: #0a0a0a;
+
+    color: var(--white);
+
+    font-size: 13px;
+
+}
+
+
+.form-group input::placeholder {
+
+    color: #555;
+
+}
+
+
+.form-group input:focus,
+.form-group select:focus {
+
+    border-color: var(--gold-dark);
+
+}
+
+
+.form-row {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 10px;
+
+}
+
+
+/* ============================================================
+   APARÊNCIA
+   ============================================================ */
+
+.appearance-placeholder {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    margin-bottom: 14px;
+
+    padding: 12px;
+
+    background: #0c0c0c;
+
+    border-radius: var(--radius-small);
+
+}
+
+
+.avatar-placeholder {
+
+    width: 60px;
+
+    height: 60px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border: 1px solid var(--gold-dark);
+
+    border-radius: 50%;
+
+    background: #151515;
+
+    color: var(--gold);
+
+    font-family: var(--font-display);
+
+    font-size: 28px;
+
+}
+
+
+.appearance-placeholder strong {
+
+    font-family: var(--font-display);
+
+    font-size: 13px;
+
+}
+
+
+.appearance-placeholder p {
+
+    margin-top: 3px;
+
+    color: var(--gray);
+
+    font-size: 10px;
+
+    line-height: 1.4;
+
+}
+
+
+/* ============================================================
+   NOTIFICAÇÕES
+   ============================================================ */
+
+.notifications-list {
+
+    padding: 16px;
+
+}
+
+
+.empty-state {
+
+    padding: 50px 20px;
+
+    text-align: center;
+
+    color: var(--gray);
+
+}
+
+
+.empty-icon {
+
+    margin-bottom: 15px;
+
+    color: var(--gold);
+
+    font-size: 30px;
+
+}
+
+
+.empty-state strong {
+
+    display: block;
+
+    color: var(--silver);
+
+    font-family: var(--font-display);
+
+    font-size: 16px;
+
+}
+
+
+.empty-state p {
+
+    max-width: 280px;
+
+    margin: 8px auto 0;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+
+}
+
+
+/* ============================================================
+   CARDS GERAIS
+   ============================================================ */
+
+.dashboard-card {
+
+    padding: 15px;
+
+    margin-bottom: 12px;
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius);
+
+    background: var(--panel);
+
+}
+
+
+.dashboard-card-title {
+
+    margin-bottom: 10px;
+
+    color: var(--gold);
+
+    font-family: var(--font-display);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+}
+
+
+.stat-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 8px;
+
+}
+
+
+.stat-box {
+
+    padding: 12px;
+
+    border-radius: var(--radius-small);
+
+    background: #0b0b0b;
+
+    border: 1px solid #202020;
+
+}
+
+
+.stat-label {
+
+    color: var(--gray);
+
+    font-size: 9px;
+
+    font-family: var(--font-display);
+
+    letter-spacing: 1px;
+
+}
+
+
+.stat-value {
+
+    margin-top: 4px;
+
+    color: var(--white);
+
+    font-family: var(--font-display);
+
+    font-size: 22px;
+
+    font-weight: 700;
+
+}
+
+
+.stat-value.gold {
+
+    color: var(--gold);
+
+}
+
+
+/* ============================================================
+   PERFIL DO LUTADOR
+   ============================================================ */
+
+.fighter-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    margin-bottom: 15px;
+
+}
+
+
+.fighter-avatar {
+
+    width: 66px;
+
+    height: 66px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border: 1px solid var(--gold-dark);
+
+    border-radius: 50%;
+
+    background: #171717;
+
+    color: var(--gold);
+
+    font-family: var(--font-display);
+
+    font-size: 25px;
+
+    font-weight: 700;
+
+}
+
+
+.fighter-name {
+
+    font-family: var(--font-display);
+
+    font-size: 23px;
+
+    font-weight: 700;
+
+}
+
+
+.fighter-meta {
+
+    margin-top: 2px;
+
+    color: var(--gray);
+
+    font-size: 10px;
+
+}
+
+
+/* ============================================================
+   BARRAS
+   ============================================================ */
+
+.progress-row {
+
+    margin-bottom: 10px;
+
+}
+
+
+.progress-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-bottom: 4px;
+
+    font-size: 9px;
+
+    color: var(--gray);
+
+}
+
+
+.progress-track {
+
+    width: 100%;
+
+    height: 5px;
+
+    overflow: hidden;
+
+    border-radius: 5px;
+
+    background: #252525;
+
+}
+
+
+.progress-fill {
+
+    height: 100%;
+
+    background: var(--gold);
+
+    border-radius: inherit;
+
+}
+
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+
+.badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    min-height: 22px;
+
+    padding: 3px 8px;
+
+    border-radius: 4px;
+
+    border: 1px solid var(--border);
+
+    background: #151515;
+
+    color: var(--silver);
+
+    font-family: var(--font-display);
+
+    font-size: 9px;
+
+    letter-spacing: 1px;
+
+}
+
+
+.badge.gold {
+
+    color: var(--gold);
+
+    border-color: var(--gold-dark);
+
+}
+
+
+.badge.success {
+
+    color: var(--success);
+
+}
+
+
+.badge.danger {
+
+    color: var(--danger);
+
+}
+
+
+/* ============================================================
+   LISTAS
+   ============================================================ */
+
+.list-item {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding: 12px 0;
+
+    border-bottom: 1px solid #222;
+
+}
+
+
+.list-item:last-child {
+
+    border-bottom: none;
+
+}
+
+
+.list-item-title {
+
+    color: var(--white);
+
+    font-size: 12px;
+
+}
+
+
+.list-item-subtitle {
+
+    margin-top: 3px;
+
+    color: var(--gray);
+
+    font-size: 9px;
+
+}
+
+
+.list-item-value {
+
+    color: var(--gold);
+
+    font-family: var(--font-display);
+
+    font-weight: 700;
+
+}
+
+
+/* ============================================================
+   ALERTAS
+   ============================================================ */
+
+.alert {
+
+    padding: 12px;
+
+    margin-bottom: 12px;
+
+    border: 1px solid var(--border);
+
+    border-left: 3px solid var(--gold);
+
+    border-radius: var(--radius-small);
+
+    background: #151515;
+
+}
+
+
+.alert-title {
+
+    color: var(--gold);
+
+    font-family: var(--font-display);
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+}
+
+
+.alert-text {
+
+    margin-top: 4px;
+
+    color: var(--gray);
+
+    font-size: 10px;
+
+    line-height: 1.4;
+
+}
