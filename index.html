@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
 
@@ -20,7 +21,10 @@
 
     <title>MMA DESTINY</title>
 
-    <!-- Fontes -->
+    <!-- =========================================================
+         FONTES
+    ========================================================== -->
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -29,22 +33,28 @@
         rel="stylesheet"
     >
 
-    <!-- CSS principal -->
+
+    <!-- =========================================================
+         CSS
+    ========================================================== -->
+
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/components.css">
     <link rel="stylesheet" href="./css/responsive.css">
+
 </head>
+
 
 <body>
 
     <!-- =========================================================
          MMA DESTINY
-         Aplicação principal
+         APLICAÇÃO PRINCIPAL
     ========================================================== -->
 
     <div id="mma-destiny-app">
 
-        <!-- O Renderer preencherá esta área -->
+        <!-- O Renderer preenche esta área -->
         <main id="app-content"></main>
 
     </div>
@@ -52,12 +62,12 @@
 
     <!-- =========================================================
          NAVEGAÇÃO PRINCIPAL
-         5 abas oficiais
+         5 ABAS OFICIAIS
     ========================================================== -->
 
     <nav
         id="main-navigation"
-        class="main-navigation"
+        class="bottom-navigation"
         aria-label="Navegação principal"
     >
 
@@ -71,6 +81,7 @@
             <span class="nav-label">INÍCIO</span>
         </button>
 
+
         <button
             type="button"
             class="nav-item"
@@ -80,6 +91,7 @@
             <span class="nav-icon">♜</span>
             <span class="nav-label">CARREIRA</span>
         </button>
+
 
         <button
             type="button"
@@ -91,6 +103,7 @@
             <span class="nav-label">MUNDO</span>
         </button>
 
+
         <button
             type="button"
             class="nav-item"
@@ -100,6 +113,7 @@
             <span class="nav-icon">◇</span>
             <span class="nav-label">VIDA</span>
         </button>
+
 
         <button
             type="button"
@@ -115,10 +129,14 @@
 
 
     <!-- =========================================================
-         BOOTSTRAP
+         JAVASCRIPT PRINCIPAL
     ========================================================== -->
 
-    <script type="module" src="./js/main.js"></script>
+    <script
+        type="module"
+        src="./js/main.js"
+    ></script>
 
 </body>
+
 </html>
