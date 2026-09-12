@@ -1,370 +1,130 @@
-import { state } from "../core/state.js";
-import {
-    getOrganizationById,
-    setChampion
-} from "./organizations.js";
+export const RANKING_TYPES = {
+    ORGANIZATION: "organization",
+    NATIONAL: "national",
+    CONTINENTAL: "continental",
+    GLOBAL: "global",
+    P4P: "p4p"
+};
 
-export const RANKING_LIMIT = 15;
-
-export function initializeOrganizationRankings(
+export function createRankingTable(
     organizationId,
     weightClass
 ) {
-    const organization =
-        getOrganizationById(organizationId);
-
-    if (!organization) {
-        return false;
-    }
-
-    if (!organization.rankings[weightClass]) {
-        organization.rankings[weightClass] = {
-            champion: null,
-            interimChampion: null,
-            rankings: []
-        };
-    }
-
-    return true;
-}
-
-export function getRankings(
-    organizationId,
-    weightClass
-) {
-    const organization =
-        getOrganizationById(organizationId);
-
-    if (!organization) {
-        return null;
-    }
-
-    initializeOrganizationRankings(
+    return {
         organizationId,
-        weightClass
-    );
+        weightClass,
 
-    return organization.rankings[
-        weightClass
-    ];
+        championId: null,
+
+        rankings: [],
+
+        updatedAt: null
+    };
 }
 
-export function updateRankings(
-    organizationId,
-    weightClass,
-    fighterIds
+export function setChampion(
+    table,
+    fighterId
 ) {
-    const ranking =
-        getRankings(
-            organizationId,
-            weightClass
-        );
-
-    if (!ranking) {
-        return false;
-    }
-
-    ranking.rankings =
-        fighterIds
-            .filter(Boolean)
-            .slice(0, RANKING_LIMIT);
-
-    return true;
+    table.championId = fighterId;
+    return table;
 }
 
-export function rankFighters(
-    organizationId,
-    weightClass,
+export function updateRanking(
+    table,
     fighters
 ) {
-    const organization =
-        getOrganizationById(organizationId);
-
-    if (!organization) {
-        return [];
-    }
-
-    const ranking =
-        getRankings(
-            organizationId,
-            weightClass
-        );
-
-    const championId =
-        ranking.champion;
-
-    const interimId =
-        ranking.interimChampion;
-
-    const ranked = fighters
+    const ranked = [...fighters]
         .filter(
             fighter =>
-                fighter.weightClass ===
-                weightClass
+                fighter.active !== false
         )
-        .filter(
-            fighter =>
-                fighter.id !== championId &&
-                fighter.id !== interimId
-        )
-        .map(fighter => ({
-            fighter,
-            score:
-                calculateRankingScore(
-                    fighter
-                )
-        }))
         .sort(
             (a, b) =>
-                b.score - a.score
+                calculateRankingScore(b) -
+                calculateRankingScore(a)
         );
 
-    ranking.rankings =
-        ranked
-            .slice(0, RANKING_LIMIT)
-            .map(item => item.fighter.id);
+    table.rankings =
+        ranked.map(
+            (fighter, index) => ({
+                position: index + 1,
+                fighterId: fighter.id,
+                score:
+                    calculateRankingScore(
+                        fighter
+                    )
+            })
+        );
 
-    return ranking.rankings;
+    return table;
 }
 
 export function calculateRankingScore(
     fighter
 ) {
-    const career =
-        fighter.career || {};
-
     const record =
-        career.record || {};
+        fighter.record || {};
 
-    const wins = record.wins || 0;
-    const losses = record.losses || 0;
-    const draws = record.draws || 0;
+    const wins =
+        record.wins || 0;
+
+    const losses =
+        record.losses || 0;
+
+    const draws =
+        record.draws || 0;
 
     const ovr =
         fighter.ovr || 0;
 
-    const experience =
-        career.experience || 0;
-
     const streak =
-        career.streak || 0;
+        fighter.streak || 0;
 
     const reputation =
         fighter.reputation || 0;
 
-    const hype =
-        fighter.hype || 0;
-
-    return (
-        ovr * 0.45 +
-        experience * 0.10 +
-        wins * 2 +
-        streak * 5 -
-        losses * 2 +
-        draws +
-        reputation * 0.08 +
-        hype * 0.04
+    return Math.round(
+        ovr * 2 +
+        wins * 12 -
+        losses * 8 +
+        draws * 2 +
+        streak * 10 +
+        reputation * 0.5
     );
 }
 
-export function getRankingPosition(
-    organizationId,
-    weightClass,
-    fighterId
+export function getRankedFighter(
+    table,
+    position
 ) {
-    const ranking =
-        getRankings(
-            organizationId,
-            weightClass
-        );
-
-    if (!ranking) {
-        return null;
-    }
-
-    if (
-        ranking.champion ===
-        fighterId
-    ) {
-        return 0;
-    }
-
-    if (
-        ranking.interimChampion ===
-        fighterId
-    ) {
-        return 0;
-    }
-
-    const index =
-        ranking.rankings.indexOf(
-            fighterId
-        );
-
-    return index === -1
-        ? null
-        : index + 1;
+    return (
+        table.rankings.find(
+            entry =>
+                entry.position === position
+        ) || null
+    );
 }
 
-export function getFighterRanking(
-    organizationId,
-    weightClass,
+export function getFighterPosition(
+    table,
     fighterId
 ) {
-    const position =
-        getRankingPosition(
-            organizationId,
-            weightClass,
-            fighterId
+    const entry =
+        table.rankings.find(
+            item =>
+                item.fighterId === fighterId
         );
 
-    if (position === null) {
-        return {
-            position: null,
-            label: "NR"
-        };
-    }
-
-    if (position === 0) {
-        return {
-            position: 0,
-            label: "C"
-        };
-    }
-
-    return {
-        position,
-        label: `#${position}`
-    };
+    return entry
+        ? entry.position
+        : null;
 }
 
 export function getTopFighters(
-    organizationId,
-    weightClass,
-    limit = 15
+    table,
+    amount = 15
 ) {
-    const ranking =
-        getRankings(
-            organizationId,
-            weightClass
-        );
-
-    if (!ranking) {
-        return [];
-    }
-
-    return ranking.rankings
-        .slice(0, limit);
-}
-
-export function getChampionId(
-    organizationId,
-    weightClass
-) {
-    const ranking =
-        getRankings(
-            organizationId,
-            weightClass
-        );
-
-    return ranking?.champion || null;
-}
-
-export function changeChampion(
-    organizationId,
-    weightClass,
-    fighterId
-) {
-    return setChampion(
-        organizationId,
-        weightClass,
-        fighterId
-    );
-}
-
-export function recalculateAllRankings(
-    organizations,
-    fighters
-) {
-    organizations.forEach(
-        organization => {
-            organization.weightClasses.forEach(
-                weightClass => {
-                    rankFighters(
-                        organization.id,
-                        weightClass,
-                        fighters
-                    );
-                }
-            );
-        }
-    );
-}
-
-export function getRankingTable(
-    organizationId,
-    weightClass,
-    fighters
-) {
-    const ranking =
-        getRankings(
-            organizationId,
-            weightClass
-        );
-
-    if (!ranking) {
-        return [];
-    }
-
-    const rows = [];
-
-    if (ranking.champion) {
-        const champion =
-            fighters.find(
-                fighter =>
-                    fighter.id ===
-                    ranking.champion
-            );
-
-        if (champion) {
-            rows.push({
-                position: 0,
-                fighterId: champion.id,
-                name:
-                    champion.identity.name,
-                nickname:
-                    champion.identity.nickname,
-                ovr: champion.ovr,
-                champion: true
-            });
-        }
-    }
-
-    ranking.rankings.forEach(
-        (fighterId, index) => {
-            const fighter =
-                fighters.find(
-                    fighter =>
-                        fighter.id ===
-                        fighterId
-                );
-
-            if (!fighter) {
-                return;
-            }
-
-            rows.push({
-                position: index + 1,
-                fighterId: fighter.id,
-                name:
-                    fighter.identity.name,
-                nickname:
-                    fighter.identity.nickname,
-                ovr: fighter.ovr,
-                champion: false
-            });
-        }
-    );
-
-    return rows;
+    return table.rankings
+        .slice(0, amount);
 }
