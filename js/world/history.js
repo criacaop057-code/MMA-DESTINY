@@ -1,166 +1,68 @@
-import { generateId } from "../core/ids.js";
-import { state } from "../core/state.js";
-
-export const HISTORY_TYPES = {
-    FIGHT: "fight",
-    TITLE: "title",
-    RANKING: "ranking",
-    CONTRACT: "contract",
-    RETIREMENT: "retirement",
-    DEBUT: "debut",
-    INJURY: "injury",
-    TRANSFER: "transfer",
-    LIFE: "life",
-    FINANCE: "finance",
-    ACADEMY: "academy",
-    RECORD: "record"
+export const HISTORY_SOURCES = {
+    REAL: "real",
+    SIMULATION: "simulation"
 };
 
 export function createHistoryEntry({
+    date,
     type,
     title,
     description,
-    fighterId = null,
-    organizationId = null,
-    eventId = null,
+    source = HISTORY_SOURCES.SIMULATION,
     data = {}
 }) {
-    const entry = {
-        id: generateId("history"),
-
+    return {
+        date,
         type,
-
         title,
-
         description,
-
-        fighterId,
-
-        organizationId,
-
-        eventId,
-
-        data,
-
-        date:
-            state.calendar?.date ||
-            new Date().toISOString(),
-
-        timestamp: Date.now()
+        source,
+        data
     };
-
-    if (!state.world.history) {
-        state.world.history = [];
-    }
-
-    state.world.history.push(entry);
-
-    return entry;
 }
 
-export function recordFightHistory(
-    fight,
-    fighterA,
-    fighterB
+export function addHistoryEntry(
+    world,
+    entry
 ) {
-    return createHistoryEntry({
-        type: HISTORY_TYPES.FIGHT,
+    world.history.push(
+        createHistoryEntry(entry)
+    );
 
-        title: `${fighterA.identity.name} vs ${fighterB.identity.name}`,
+    world.history.sort(
+        (a, b) =>
+            new Date(a.date) -
+            new Date(b.date)
+    );
 
-        description:
-            fight.result?.winnerId
-                ? `${getFighterName(
-                      fight.result.winnerId,
-                      fighterA,
-                      fighterB
-                  )} venceu por ${
-                      fight.result.method ||
-                      "decisão"
-                  }.`
-                : "A luta terminou empatada.",
-
-        fighterId:
-            fight.result?.winnerId || null,
-
-        organizationId:
-            fight.organizationId || null,
-
-        eventId:
-            fight.eventId || null,
-
-        data: {
-            fightId: fight.id,
-            result: fight.result
-        }
-    });
+    return world.history;
 }
 
-function getFighterName(
-    fighterId,
-    fighterA,
-    fighterB
+export function getHistoryByDate(
+    world,
+    date
 ) {
-    if (fighterA.id === fighterId) {
-        return fighterA.identity.name;
-    }
-
-    if (fighterB.id === fighterId) {
-        return fighterB.identity.name;
-    }
-
-    return "Lutador";
+    return world.history.filter(
+        entry =>
+            entry.date === date
+    );
 }
 
-export function getHistory({
-    type = null,
-    fighterId = null,
-    organizationId = null,
-    limit = 100
-} = {}) {
-    let history = [
-        ...(state.world.history || [])
-    ];
-
-    if (type) {
-        history = history.filter(
-            item => item.type === type
-        );
-    }
-
-    if (fighterId) {
-        history = history.filter(
-            item =>
-                item.fighterId === fighterId ||
-                item.data?.fighterIds?.includes(
-                    fighterId
-                )
-        );
-    }
-
-    if (organizationId) {
-        history = history.filter(
-            item =>
-                item.organizationId ===
-                organizationId
-        );
-    }
-
-    return history
-        .sort(
-            (a, b) =>
-                b.timestamp -
-                a.timestamp
-        )
-        .slice(0, limit);
-}
-
-export function getLatestHistory(
-    limit = 20
+export function getHistoryBySource(
+    world,
+    source
 ) {
-    return getHistory({ limit });
+    return world.history.filter(
+        entry =>
+            entry.source === source
+    );
 }
 
-export function clearHistory() {
-    state.world.history = [];
+export function getRecentHistory(
+    world,
+    amount = 20
+) {
+    return [...world.history]
+        .slice(-amount)
+        .reverse();
 }
