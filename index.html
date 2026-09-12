@@ -1,1 +1,694 @@
-<!-- MMA DESTINY - Main Entry Point -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <meta name="theme-color" content="#080808">
+
+    <title>MMA DESTINY</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- CSS principal -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body>
+
+    <!--
+        ============================================================
+        MMA DESTINY
+        Aplicação principal
+        ============================================================
+    -->
+
+    <div id="app">
+
+        <!-- ========================================================
+             TELA DE CARREGAMENTO
+             ======================================================== -->
+
+        <section id="loading-screen" class="screen loading-screen">
+
+            <div class="loading-logo">
+
+                <div class="logo-small">
+                    MMA
+                </div>
+
+                <div class="logo-main">
+                    DESTINY
+                </div>
+
+                <div class="logo-subtitle">
+                    LUXURY COMBAT
+                </div>
+
+            </div>
+
+            <div class="loading-bar">
+                <div id="loading-progress"></div>
+            </div>
+
+            <p class="loading-text">
+                INICIALIZANDO MUNDO...
+            </p>
+
+        </section>
+
+
+        <!-- ========================================================
+             MENU PRINCIPAL
+             ======================================================== -->
+
+        <section id="main-menu" class="screen hidden">
+
+            <div class="menu-container">
+
+                <div class="brand-area">
+
+                    <div class="brand-small">
+                        MMA
+                    </div>
+
+                    <h1 class="brand-title">
+                        DESTINY
+                    </h1>
+
+                    <div class="brand-line"></div>
+
+                    <p class="brand-subtitle">
+                        LUXURY COMBAT
+                    </p>
+
+                    <p class="brand-tagline">
+                        CONSTRUA SUA DINASTIA
+                    </p>
+
+                </div>
+
+
+                <div class="menu-actions">
+
+                    <button
+                        id="btn-continue"
+                        class="menu-button primary"
+                    >
+                        <span>CONTINUAR</span>
+                        <small id="continue-name">
+                            Nenhum jogo salvo
+                        </small>
+                    </button>
+
+
+                    <button
+                        id="btn-new-game"
+                        class="menu-button"
+                    >
+                        <span>NOVO JOGO</span>
+                        <small>Começar uma nova carreira</small>
+                    </button>
+
+
+                    <button
+                        id="btn-settings"
+                        class="menu-button"
+                    >
+                        <span>CONFIGURAÇÕES</span>
+                        <small>Opções do jogo</small>
+                    </button>
+
+                </div>
+
+
+                <div class="menu-footer">
+
+                    <span>
+                        MMA DESTINY
+                    </span>
+
+                    <span>
+                        v0.1.0
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             CRIAÇÃO DO LUTADOR
+             ======================================================== -->
+
+        <section id="creation-screen" class="screen hidden">
+
+            <div class="screen-header">
+
+                <button
+                    id="btn-back-creation"
+                    class="icon-button"
+                >
+                    ←
+                </button>
+
+                <div>
+                    <div class="section-kicker">
+                        NOVA CARREIRA
+                    </div>
+
+                    <h2>
+                        CRIE SEU LUTADOR
+                    </h2>
+                </div>
+
+            </div>
+
+
+            <div class="creation-container">
+
+                <!-- IDENTIDADE -->
+
+                <div class="form-card">
+
+                    <div class="card-title">
+                        IDENTIDADE
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="fighter-name">
+                            NOME
+                        </label>
+
+                        <input
+                            id="fighter-name"
+                            type="text"
+                            maxlength="40"
+                            placeholder="Nome do lutador"
+                            autocomplete="off"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="fighter-nickname">
+                            APELIDO
+                        </label>
+
+                        <input
+                            id="fighter-nickname"
+                            type="text"
+                            maxlength="25"
+                            placeholder="Opcional"
+                            autocomplete="off"
+                        >
+
+                    </div>
+
+
+                    <div class="form-row">
+
+                        <div class="form-group">
+
+                            <label for="fighter-country">
+                                PAÍS
+                            </label>
+
+                            <select id="fighter-country">
+
+                                <option value="BR">
+                                    Brasil
+                                </option>
+
+                                <option value="US">
+                                    Estados Unidos
+                                </option>
+
+                                <option value="ES">
+                                    Espanha
+                                </option>
+
+                                <option value="PT">
+                                    Portugal
+                                </option>
+
+                                <option value="MX">
+                                    México
+                                </option>
+
+                                <option value="AR">
+                                    Argentina
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="fighter-age">
+                                IDADE
+                            </label>
+
+                            <select id="fighter-age">
+
+                                <option value="15">
+                                    15 anos
+                                </option>
+
+                                <option value="16">
+                                    16 anos
+                                </option>
+
+                                <option value="17">
+                                    17 anos
+                                </option>
+
+                                <option value="18">
+                                    18 anos
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CATEGORIA -->
+
+                <div class="form-card">
+
+                    <div class="card-title">
+                        PERFIL DE COMBATE
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="fighter-weight">
+                            CATEGORIA
+                        </label>
+
+                        <select id="fighter-weight">
+
+                            <option value="flyweight">
+                                Peso-Mosca
+                            </option>
+
+                            <option value="bantamweight">
+                                Peso-Galo
+                            </option>
+
+                            <option value="featherweight">
+                                Peso-Pena
+                            </option>
+
+                            <option value="lightweight">
+                                Peso-Leve
+                            </option>
+
+                            <option value="welterweight">
+                                Meio-Médio
+                            </option>
+
+                            <option value="middleweight">
+                                Peso-Médio
+                            </option>
+
+                            <option value="light-heavyweight">
+                                Meio-Pesado
+                            </option>
+
+                            <option value="heavyweight">
+                                Peso-Pesado
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="fighter-style">
+                            ESTILO
+                        </label>
+
+                        <select id="fighter-style">
+
+                            <option value="mixed">
+                                Mixed
+                            </option>
+
+                            <option value="striker">
+                                Striker
+                            </option>
+
+                            <option value="wrestler">
+                                Wrestler
+                            </option>
+
+                            <option value="grappler">
+                                Grappler
+                            </option>
+
+                            <option value="brawler">
+                                Brawler
+                            </option>
+
+                            <option value="counter">
+                                Counter Striker
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- APARÊNCIA -->
+
+                <div class="form-card">
+
+                    <div class="card-title">
+                        APARÊNCIA
+                    </div>
+
+                    <div class="appearance-placeholder">
+
+                        <div class="avatar-placeholder">
+                            ?
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                PERSONALIZAÇÃO
+                            </strong>
+
+                            <p>
+                                A aparência completa será adicionada
+                                ao sistema de criação.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <button
+                        id="btn-random-appearance"
+                        class="secondary-button"
+                    >
+                        GERAR APARÊNCIA ALEATÓRIA
+                    </button>
+
+                </div>
+
+
+                <!-- CONFIRMAR -->
+
+                <button
+                    id="btn-create-fighter"
+                    class="gold-button"
+                >
+                    CRIAR LUTADOR
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             JOGO
+             ======================================================== -->
+
+        <section id="game-screen" class="screen hidden">
+
+            <!-- TOPBAR -->
+
+            <header class="game-topbar">
+
+                <div>
+
+                    <div class="game-brand">
+                        MMA DESTINY
+                    </div>
+
+                    <div
+                        id="game-date"
+                        class="game-date"
+                    >
+                        Semana 1 • Ano 1
+                    </div>
+
+                </div>
+
+
+                <button
+                    id="btn-notifications"
+                    class="notification-button"
+                >
+
+                    <span>
+                        ◇
+                    </span>
+
+                    <i id="notification-count">
+                        0
+                    </i>
+
+                </button>
+
+            </header>
+
+
+            <!-- CONTEÚDO -->
+
+            <main
+                id="game-content"
+                class="game-content"
+            >
+
+                <!-- O JavaScript preencherá esta área -->
+
+            </main>
+
+
+            <!-- NAVEGAÇÃO -->
+
+            <nav class="bottom-navigation">
+
+                <button
+                    class="nav-item active"
+                    data-tab="home"
+                >
+
+                    <span class="nav-icon">
+                        ◆
+                    </span>
+
+                    <span>
+                        INÍCIO
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-tab="career"
+                >
+
+                    <span class="nav-icon">
+                        ◈
+                    </span>
+
+                    <span>
+                        CARREIRA
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-tab="world"
+                >
+
+                    <span class="nav-icon">
+                        ◎
+                    </span>
+
+                    <span>
+                        MUNDO
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-tab="life"
+                >
+
+                    <span class="nav-icon">
+                        ◇
+                    </span>
+
+                    <span>
+                        VIDA
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-tab="dynasty"
+                >
+
+                    <span class="nav-icon">
+                        ♜
+                    </span>
+
+                    <span>
+                        DINASTIA
+                    </span>
+
+                </button>
+
+            </nav>
+
+        </section>
+
+
+        <!-- ========================================================
+             NOTIFICAÇÕES
+             ======================================================== -->
+
+        <section
+            id="notifications-screen"
+            class="screen hidden"
+        >
+
+            <div class="screen-header">
+
+                <button
+                    id="btn-back-notifications"
+                    class="icon-button"
+                >
+                    ←
+                </button>
+
+                <div>
+
+                    <div class="section-kicker">
+                        CENTRAL
+                    </div>
+
+                    <h2>
+                        NOTIFICAÇÕES
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="notifications-list"
+                class="notifications-list"
+            >
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        ◇
+                    </div>
+
+                    <strong>
+                        Nenhuma notificação
+                    </strong>
+
+                    <p>
+                        Os acontecimentos importantes
+                        aparecerão aqui.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             ERRO
+             ======================================================== -->
+
+        <section
+            id="error-screen"
+            class="screen hidden"
+        >
+
+            <div class="error-container">
+
+                <div class="error-code">
+                    ERROR
+                </div>
+
+                <h2>
+                    FALHA AO INICIAR
+                </h2>
+
+                <p id="error-message">
+                    Ocorreu um erro ao inicializar o jogo.
+                </p>
+
+                <button
+                    id="btn-reload"
+                    class="gold-button"
+                >
+                    TENTAR NOVAMENTE
+                </button>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- JavaScript será conectado na próxima etapa -->
+
+    <script type="module" src="js/main.js"></script>
+
+</body>
+
+</html>
