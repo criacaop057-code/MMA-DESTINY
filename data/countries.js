@@ -193,7 +193,7 @@ export const COUNTRIES = [
         continent: "Africa",
         currency: "ZAR"
     },
-    {
+        {
         id: "MAR",
         name: "Marrocos",
         continent: "Africa",
