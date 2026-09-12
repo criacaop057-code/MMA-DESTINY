@@ -1,254 +1,94 @@
-import { generateId } from "../core/ids.js";
-import { state } from "../core/state.js";
-import {
-    getOrganizationById,
-    setChampion,
-    setInterimChampion
-} from "./organizations.js";
+import { createId } from "../core/ids.js";
 
 export function createChampionship({
     organizationId,
     weightClass,
-    name = null
+    name = "",
+    interim = false
 }) {
-    const organization =
-        getOrganizationById(organizationId);
-
-    if (!organization) {
-        throw new Error(
-            "Organização não encontrada."
-        );
-    }
-
-    const championship = {
-        id: generateId("title"),
+    return {
+        id: createId("championship"),
 
         organizationId,
-
         weightClass,
 
-        name:
-            name ||
-            `${organization.acronym} ${weightClass} Championship`,
+        name,
 
         championId: null,
 
-        interimChampionId: null,
+        interim,
 
         defenses: 0,
 
-        totalFights: 0,
+        lineage: [],
 
-        history: [],
-
-        status: "active",
-
-        createdAt: Date.now()
+        history: []
     };
-
-    if (!state.world.championships) {
-        state.world.championships = [];
-    }
-
-    state.world.championships.push(
-        championship
-    );
-
-    organization.championships[
-        weightClass
-    ] = championship.id;
-
-    return championship;
 }
 
-export function getChampionshipById(id) {
-    return (
-        state.world.championships?.find(
-            championship =>
-                championship.id === id
-        ) || null
-    );
-}
-
-export function getChampionship(
-    organizationId,
-    weightClass
+export function crownChampion(
+    championship,
+    fighterId,
+    method = "title_fight"
 ) {
-    return (
-        state.world.championships?.find(
-            championship =>
-                championship.organizationId ===
-                    organizationId &&
-                championship.weightClass ===
-                    weightClass
-        ) || null
-    );
-}
-
-export function setChampionshipChampion(
-    championshipId,
-    fighterId
-) {
-    const championship =
-        getChampionshipById(
-            championshipId
-        );
-
-    if (!championship) {
-        return false;
+    if (
+        championship.championId
+    ) {
+        championship.lineage.push({
+            fighterId:
+                championship.championId,
+            defenses:
+                championship.defenses
+        });
     }
-
-    const organization =
-        getOrganizationById(
-            championship.organizationId
-        );
 
     championship.championId =
         fighterId;
 
-    championship.interimChampionId =
-        null;
-
-    setChampion(
-        organization.id,
-        championship.weightClass,
-        fighterId
-    );
+    championship.defenses = 0;
 
     championship.history.push({
-        type: "new_champion",
+        id: createId("title_history"),
         fighterId,
-        date: Date.now()
-    });
-
-    return true;
-}
-
-export function setInterimChampionForTitle(
-    championshipId,
-    fighterId
-) {
-    const championship =
-        getChampionshipById(
-            championshipId
-        );
-
-    if (!championship) {
-        return false;
-    }
-
-    championship.interimChampionId =
-        fighterId;
-
-    setInterimChampion(
-        championship.organizationId,
-        championship.weightClass,
-        fighterId
-    );
-
-    championship.history.push({
-        type: "interim_champion",
-        fighterId,
-        date: Date.now()
-    });
-
-    return true;
-}
-
-export function recordTitleFight(
-    championshipId,
-    {
-        winnerId,
-        loserId,
         method,
-        successfulDefense = false
-    }
-) {
-    const championship =
-        getChampionshipById(
-            championshipId
-        );
-
-    if (!championship) {
-        return false;
-    }
-
-    championship.totalFights++;
-
-    if (successfulDefense) {
-        championship.defenses++;
-    }
-
-    championship.history.push({
-        type: successfulDefense
-            ? "title_defense"
-            : "title_change",
-        winnerId,
-        loserId,
-        method,
-        date: Date.now()
+        date: null
     });
 
-    return true;
+    return championship;
 }
 
-export function vacateTitle(
-    championshipId,
-    reason = "Campeão indisponível"
+export function recordDefense(
+    championship
 ) {
-    const championship =
-        getChampionshipById(
-            championshipId
-        );
-
-    if (!championship) {
+    if (!championship.championId) {
         return false;
     }
 
+    championship.defenses++;
+
+    return championship.defenses;
+}
+
+export function vacateChampionship(
+    championship,
+    reason = ""
+) {
     championship.history.push({
-        type: "vacated",
-        reason,
-        formerChampion:
+        id: createId("title_vacancy"),
+        previousChampion:
             championship.championId,
-        date: Date.now()
+        reason,
+        date: null
     });
 
     championship.championId = null;
-    championship.interimChampionId = null;
+    championship.defenses = 0;
 
-    const organization =
-        getOrganizationById(
-            championship.organizationId
-        );
-
-    if (organization) {
-        organization.rankings[
-            championship.weightClass
-        ].champion = null;
-
-        organization.rankings[
-            championship.weightClass
-        ].interimChampion = null;
-    }
-
-    return true;
+    return championship;
 }
 
-export function getTitleHistory(
-    championshipId
+export function getCurrentChampion(
+    championship
 ) {
-    const championship =
-        getChampionshipById(
-            championshipId
-        );
-
-    return championship
-        ? [...championship.history]
-        : [];
-}
-
-export function getAllChampionships() {
-    return [
-        ...(state.world.championships || [])
-    ];
+    return championship.championId;
 }
