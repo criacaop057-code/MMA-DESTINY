@@ -8,11 +8,7 @@ const ROUTES = {
 
 class Router {
 
-    constructor({
-        renderer,
-        state,
-        engine
-    }) {
+    constructor({ renderer, state, engine }) {
         this.renderer = renderer;
         this.state = state;
         this.engine = engine;
@@ -31,46 +27,70 @@ class Router {
         this.bindNavigation();
         this.bindHistory();
 
-        /*
-         * A renderização inicial é feita pelo boot.
-         * Aqui apenas garantimos que o Router esteja pronto.
-         */
+        console.log("[MMA DESTINY] Router ativo.");
     }
 
     bindNavigation() {
 
+        const handleNavigation = (event) => {
+
+            const path = event.composedPath
+                ? event.composedPath()
+                : [];
+
+            let element = null;
+
+            for (const item of path) {
+                if (
+                    item &&
+                    item.nodeType === 1 &&
+                    item.matches &&
+                    item.matches("[data-route]")
+                ) {
+                    element = item;
+                    break;
+                }
+            }
+
+            if (!element) {
+                return;
+            }
+
+            if (element.disabled) {
+                return;
+            }
+
+            const route = element.getAttribute("data-route");
+
+            if (!this.isValidRoute(route)) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            this.navigate(route);
+        };
+
+        /*
+         * Pointer Events funcionam melhor no iPhone,
+         * Android e desktop do que depender somente
+         * do click.
+         */
+        document.addEventListener(
+            "pointerup",
+            handleNavigation,
+            true
+        );
+
+        /*
+         * Fallback para navegadores que não entreguem
+         * PointerEvent corretamente.
+         */
         document.addEventListener(
             "click",
-            (event) => {
-
-                const element =
-                    event.target.closest(
-                        "[data-route]"
-                    );
-
-                if (!element) {
-                    return;
-                }
-
-                /*
-                 * Não interfere em elementos desabilitados.
-                 */
-                if (element.disabled) {
-                    return;
-                }
-
-                event.preventDefault();
-                event.stopPropagation();
-
-                const route =
-                    element.dataset.route;
-
-                if (!this.isValidRoute(route)) {
-                    return;
-                }
-
-                this.navigate(route);
-            }
+            handleNavigation,
+            true
         );
     }
 
@@ -80,17 +100,13 @@ class Router {
             "hashchange",
             () => {
 
-                const hash =
-                    this.getHashRoute();
+                const hash = this.getHashRoute();
 
                 if (
                     this.isValidRoute(hash) &&
                     hash !== this.currentRoute
                 ) {
-                    this.navigate(
-                        hash,
-                        false
-                    );
+                    this.navigate(hash, false);
                 }
             }
         );
@@ -99,16 +115,10 @@ class Router {
             "popstate",
             () => {
 
-                const hash =
-                    this.getHashRoute();
+                const hash = this.getHashRoute();
 
-                if (
-                    this.isValidRoute(hash)
-                ) {
-                    this.navigate(
-                        hash,
-                        false
-                    );
+                if (this.isValidRoute(hash)) {
+                    this.navigate(hash, false);
                 } else {
                     this.navigate(
                         ROUTES.HOME,
@@ -121,16 +131,10 @@ class Router {
 
     handleInitialRoute() {
 
-        const hash =
-            this.getHashRoute();
+        const hash = this.getHashRoute();
 
         if (this.isValidRoute(hash)) {
-
-            this.navigate(
-                hash,
-                false
-            );
-
+            this.navigate(hash, false);
             return;
         }
 
@@ -148,30 +152,29 @@ class Router {
             .toLowerCase();
     }
 
-    navigate(
-        route,
-        updateHash = true
-    ) {
+    navigate(route, updateHash = true) {
 
         if (!this.isValidRoute(route)) {
             route = ROUTES.HOME;
         }
 
+        console.log(
+            "[MMA DESTINY] Navegando para:",
+            route
+        );
+
         this.currentRoute = route;
 
         if (updateHash) {
 
-            const newHash =
-                `#${route}`;
+            const newHash = `#${route}`;
 
             if (
                 window.location.hash !==
                 newHash
             ) {
                 window.history.pushState(
-                    {
-                        route
-                    },
+                    { route },
                     "",
                     newHash
                 );
@@ -183,11 +186,9 @@ class Router {
         if (
             this.renderer &&
             typeof this.renderer.renderRoute ===
-                "function"
+            "function"
         ) {
-            this.renderer.renderRoute(
-                route
-            );
+            this.renderer.renderRoute(route);
         }
     }
 
@@ -201,12 +202,10 @@ class Router {
         elements.forEach(
             (element) => {
 
-                const route =
-                    element.dataset.route;
-
                 const active =
-                    route ===
-                    this.currentRoute;
+                    element.getAttribute(
+                        "data-route"
+                    ) === this.currentRoute;
 
                 element.classList.toggle(
                     "active",
@@ -225,44 +224,32 @@ class Router {
 
     isValidRoute(route) {
 
-        return Object
-            .values(ROUTES)
+        return Object.values(ROUTES)
             .includes(route);
     }
 
     getCurrentRoute() {
-
         return this.currentRoute;
     }
 
     goHome() {
-        this.navigate(
-            ROUTES.HOME
-        );
+        this.navigate(ROUTES.HOME);
     }
 
     goCareer() {
-        this.navigate(
-            ROUTES.CAREER
-        );
+        this.navigate(ROUTES.CAREER);
     }
 
     goWorld() {
-        this.navigate(
-            ROUTES.WORLD
-        );
+        this.navigate(ROUTES.WORLD);
     }
 
     goLife() {
-        this.navigate(
-            ROUTES.LIFE
-        );
+        this.navigate(ROUTES.LIFE);
     }
 
     goDynasty() {
-        this.navigate(
-            ROUTES.DYNASTY
-        );
+        this.navigate(ROUTES.DYNASTY);
     }
 }
 
