@@ -1,25 +1,124 @@
-import { getState, updateState } from "../core/state.js";
-import { TABS } from "../core/constants.js";
+const ROUTES = {
+    HOME: "inicio",
+    CAREER: "carreira",
+    WORLD: "mundo",
+    LIFE: "vida",
+    DYNASTY: "dinastia"
+};
 
-export function navigateTo(tab) {
-    const validTabs = Object.values(TABS);
+class Router {
+    constructor({ renderer, state, engine }) {
+        this.renderer = renderer;
+        this.state = state;
+        this.engine = engine;
 
-    if (!validTabs.includes(tab)) {
-        console.warn(`Aba inválida: ${tab}`);
-        return;
+        this.currentRoute = ROUTES.HOME;
+        this.initialized = false;
     }
 
-    updateState(state => {
-        state.meta.activeTab = tab;
-    });
+    init() {
+        if (this.initialized) return;
 
-    window.dispatchEvent(
-        new CustomEvent("game:navigation", {
-            detail: { tab }
-        })
-    );
+        this.initialized = true;
+
+        this.bindNavigation();
+        this.handleInitialRoute();
+    }
+
+    bindNavigation() {
+        document.addEventListener("click", (event) => {
+            const element = event.target.closest("[data-route]");
+
+            if (!element) return;
+
+            event.preventDefault();
+
+            const route = element.dataset.route;
+
+            if (this.isValidRoute(route)) {
+                this.navigate(route);
+            }
+        });
+    }
+
+    handleInitialRoute() {
+        const hash = window.location.hash.replace("#", "").trim();
+
+        if (this.isValidRoute(hash)) {
+            this.navigate(hash, false);
+            return;
+        }
+
+        this.navigate(ROUTES.HOME, false);
+    }
+
+    navigate(route, updateHash = true) {
+        if (!this.isValidRoute(route)) {
+            route = ROUTES.HOME;
+        }
+
+        this.currentRoute = route;
+
+        if (updateHash) {
+            window.history.replaceState(
+                null,
+                "",
+                `#${route}`
+            );
+        }
+
+        this.updateNavigation();
+        this.renderer.renderRoute(route);
+    }
+
+    updateNavigation() {
+        const elements = document.querySelectorAll("[data-route]");
+
+        elements.forEach((element) => {
+            const route = element.dataset.route;
+
+            element.classList.toggle(
+                "active",
+                route === this.currentRoute
+            );
+
+            element.setAttribute(
+                "aria-current",
+                route === this.currentRoute ? "page" : "false"
+            );
+        });
+    }
+
+    isValidRoute(route) {
+        return Object.values(ROUTES).includes(route);
+    }
+
+    getCurrentRoute() {
+        return this.currentRoute;
+    }
+
+    goHome() {
+        this.navigate(ROUTES.HOME);
+    }
+
+    goCareer() {
+        this.navigate(ROUTES.CAREER);
+    }
+
+    goWorld() {
+        this.navigate(ROUTES.WORLD);
+    }
+
+    goLife() {
+        this.navigate(ROUTES.LIFE);
+    }
+
+    goDynasty() {
+        this.navigate(ROUTES.DYNASTY);
+    }
 }
 
-export function getCurrentTab() {
-    return getState().meta.activeTab;
-}
+export {
+    Router,
+    ROUTES
+};
