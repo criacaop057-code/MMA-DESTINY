@@ -3,13 +3,16 @@ import { getState } from "../core/state.js";
 
 class Renderer {
     constructor({ root, state, engine }) {
-        this.root = root;
-        this.state = state;
-        this.engine = engine;
+    this.root = root;
+    this.state = state || getState();
+    this.engine = engine;
 
-        this.appContainer = null;
+    this.appContainer = null;
 
-        this.injectRuntimeStyles();
+    this.injectRuntimeStyles();
+
+    this.bindInteractionSystem();
+}
      // =========================================================
     // SISTEMA DE INTERAÇÃO - MMA DESTINY
     // =========================================================
