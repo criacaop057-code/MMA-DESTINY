@@ -1,342 +1,148 @@
-import { generateId } from "../core/ids.js";
-import { state } from "../core/state.js";
-import { WEIGHT_CLASSES } from "../core/constants.js";
-
-export const ORGANIZATION_TYPES = {
-    MAJOR: "major",
-    INTERNATIONAL: "international",
-    REGIONAL: "regional",
-    AMATEUR: "amateur"
-};
-
-export const ORGANIZATION_STATUS = {
-    ACTIVE: "active",
-    INACTIVE: "inactive"
-};
-
-function createRankingStructure() {
-    const rankings = {};
-
-    Object.keys(WEIGHT_CLASSES).forEach(weightClass => {
-        rankings[weightClass] = {
-            champion: null,
-            interimChampion: null,
-            rankings: []
-        };
-    });
-
-    return rankings;
-}
+import { createId } from "../core/ids.js";
 
 export function createOrganization({
     name,
-    acronym,
-    country = "Brasil",
-    type = ORGANIZATION_TYPES.REGIONAL,
-    reputation = 50,
-    rules = {}
+    shortName = "",
+    country = "",
+    type = "mma",
+    founded = null,
+    source = "simulated",
+    canonical = false
 }) {
     return {
-        id: generateId("org"),
+        id: createId("org"),
 
         name,
-        acronym,
+        shortName,
+
         country,
         type,
+        founded,
 
-        status: ORGANIZATION_STATUS.ACTIVE,
+        source,
+        canonical,
 
-        reputation,
-        prestige: calculatePrestige(type, reputation),
+        active: true,
 
-        finances: {
-            balance: 0,
-            revenue: 0,
-            expenses: 0
-        },
+        prestige: 50,
+        reputation: 50,
 
-        roster: [],
+        weightClasses: [],
 
-        weightClasses: Object.keys(WEIGHT_CLASSES),
+        fighters: [],
 
-        rankings: createRankingStructure(),
-
-        championships: {},
+        champions: {},
 
         events: [],
 
-        rules: {
-            rounds: rules.rounds || 3,
-            titleRounds: rules.titleRounds || 5,
-            judging: rules.judging || "10-point-must",
-            weighInAllowance:
-                typeof rules.weighInAllowance === "number"
-                    ? rules.weighInAllowance
-                    : 0,
-            catchweightAllowed: rules.catchweightAllowed !== false,
-            interimTitles: rules.interimTitles !== false
-        },
+        rankings: {},
 
-        statistics: {
-            totalEvents: 0,
-            totalFights: 0,
-            totalTitleFights: 0,
-            totalKnockouts: 0,
-            totalSubmissions: 0,
-            totalDecisions: 0
-        },
+        history: [],
 
-        createdAt: Date.now()
+        finances: {
+            revenue: 0,
+            expenses: 0,
+            value: 0
+        }
     };
 }
 
-function calculatePrestige(type, reputation) {
-    const multipliers = {
-        [ORGANIZATION_TYPES.MAJOR]: 1.5,
-        [ORGANIZATION_TYPES.INTERNATIONAL]: 1.25,
-        [ORGANIZATION_TYPES.REGIONAL]: 1,
-        [ORGANIZATION_TYPES.AMATEUR]: 0.6
-    };
-
-    return Math.round(reputation * (multipliers[type] || 1));
-}
-
-export function addOrganization(organization) {
-    if (!state.world.organizations) {
-        state.world.organizations = [];
+export function addFighterToOrganization(
+    organization,
+    fighterId
+) {
+    if (
+        !organization.fighters
+            .includes(fighterId)
+    ) {
+        organization.fighters.push(
+            fighterId
+        );
     }
-
-    state.world.organizations.push(organization);
 
     return organization;
 }
 
-export function getOrganizationById(id) {
-    return (
-        state.world.organizations?.find(
-            organization => organization.id === id
-        ) || null
-    );
-}
-
-export function getOrganizationByAcronym(acronym) {
-    return (
-        state.world.organizations?.find(
-            organization =>
-                organization.acronym?.toLowerCase() ===
-                acronym?.toLowerCase()
-        ) || null
-    );
-}
-
-export function getActiveOrganizations() {
-    return (state.world.organizations || []).filter(
-        organization =>
-            organization.status === ORGANIZATION_STATUS.ACTIVE
-    );
-}
-
-export function getOrganizationsByCountry(country) {
-    return (state.world.organizations || []).filter(
-        organization => organization.country === country
-    );
-}
-
-export function addFighterToOrganization(
-    organizationId,
-    fighterId
-) {
-    const organization = getOrganizationById(organizationId);
-
-    if (!organization) {
-        return false;
-    }
-
-    if (!organization.roster.includes(fighterId)) {
-        organization.roster.push(fighterId);
-    }
-
-    return true;
-}
-
 export function removeFighterFromOrganization(
-    organizationId,
+    organization,
     fighterId
 ) {
-    const organization = getOrganizationById(organizationId);
+    organization.fighters =
+        organization.fighters.filter(
+            id => id !== fighterId
+        );
 
-    if (!organization) {
-        return false;
+    return organization;
+}
+
+export function addWeightClass(
+    organization,
+    weightClass
+) {
+    if (
+        !organization.weightClasses
+            .includes(weightClass)
+    ) {
+        organization.weightClasses.push(
+            weightClass
+        );
     }
 
-    organization.roster = organization.roster.filter(
-        id => id !== fighterId
-    );
-
-    return true;
+    return organization;
 }
 
 export function setChampion(
-    organizationId,
+    organization,
     weightClass,
     fighterId
 ) {
-    const organization = getOrganizationById(organizationId);
+    organization.champions[
+        weightClass
+    ] = fighterId;
 
-    if (!organization) {
-        return false;
-    }
-
-    ensureWeightClass(organization, weightClass);
-
-    organization.rankings[weightClass].champion = fighterId;
-
-    return true;
-}
-
-export function setInterimChampion(
-    organizationId,
-    weightClass,
-    fighterId
-) {
-    const organization = getOrganizationById(organizationId);
-
-    if (!organization) {
-        return false;
-    }
-
-    ensureWeightClass(organization, weightClass);
-
-    organization.rankings[weightClass].interimChampion = fighterId;
-
-    return true;
-}
-
-function ensureWeightClass(organization, weightClass) {
-    if (!organization.rankings[weightClass]) {
-        organization.rankings[weightClass] = {
-            champion: null,
-            interimChampion: null,
-            rankings: []
-        };
-    }
+    return organization;
 }
 
 export function getChampion(
-    organizationId,
+    organization,
     weightClass
 ) {
-    const organization = getOrganizationById(organizationId);
-
-    if (!organization) {
-        return null;
-    }
-
-    return organization.rankings[weightClass]?.champion || null;
-}
-
-export function getInterimChampion(
-    organizationId,
-    weightClass
-) {
-    const organization = getOrganizationById(organizationId);
-
-    if (!organization) {
-        return null;
-    }
-
     return (
-        organization.rankings[weightClass]?.interimChampion ||
-        null
+        organization.champions[
+            weightClass
+        ] || null
     );
 }
 
 export function addOrganizationEvent(
-    organizationId,
+    organization,
     eventId
 ) {
-    const organization = getOrganizationById(organizationId);
-
-    if (!organization) {
-        return false;
-    }
-
-    if (!organization.events.includes(eventId)) {
-        organization.events.push(eventId);
-        organization.statistics.totalEvents++;
-    }
-
-    return true;
-}
-
-export function registerOrganizationFight(
-    organizationId,
-    {
-        titleFight = false,
-        method = null
-    } = {}
-) {
-    const organization = getOrganizationById(organizationId);
-
-    if (!organization) {
-        return false;
-    }
-
-    organization.statistics.totalFights++;
-
-    if (titleFight) {
-        organization.statistics.totalTitleFights++;
-    }
-
-    if (method === "KO" || method === "TKO") {
-        organization.statistics.totalKnockouts++;
-    }
-
-    if (method === "SUBMISSION") {
-        organization.statistics.totalSubmissions++;
-    }
-
     if (
-        [
-            "UNANIMOUS_DECISION",
-            "SPLIT_DECISION",
-            "MAJORITY_DECISION",
-            "TECHNICAL_DECISION"
-        ].includes(method)
+        !organization.events
+            .includes(eventId)
     ) {
-        organization.statistics.totalDecisions++;
+        organization.events.push(
+            eventId
+        );
     }
 
-    return true;
+    return organization;
 }
 
-export function getOrganizationRoster(organizationId) {
-    const organization = getOrganizationById(organizationId);
+export function updateOrganizationPrestige(
+    organization,
+    amount
+) {
+    organization.prestige =
+        Math.max(
+            0,
+            Math.min(
+                100,
+                organization.prestige +
+                amount
+            )
+        );
 
-    return organization
-        ? [...organization.roster]
-        : [];
-}
-
-export function getOrganizationSummary(organizationId) {
-    const organization = getOrganizationById(organizationId);
-
-    if (!organization) {
-        return null;
-    }
-
-    return {
-        id: organization.id,
-        name: organization.name,
-        acronym: organization.acronym,
-        country: organization.country,
-        type: organization.type,
-        reputation: organization.reputation,
-        prestige: organization.prestige,
-        rosterSize: organization.roster.length,
-        events: organization.statistics.totalEvents,
-        fights: organization.statistics.totalFights,
-        titleFights:
-            organization.statistics.totalTitleFights
-    };
+    return organization.prestige;
 }
