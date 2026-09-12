@@ -1,1 +1,812 @@
-/* Main Styles */
+/* ============================================================
+   MMA DESTINY
+   STYLE.CSS
+   Identidade visual principal
+   ============================================================ */
+
+:root {
+
+    --bg: #070707;
+    --bg-soft: #0d0d0d;
+    --panel: #111111;
+    --panel-light: #171717;
+
+    --border: #292929;
+    --border-light: #383838;
+
+    --gold: #d5b56b;
+    --gold-light: #ead08a;
+    --gold-dark: #8d7136;
+
+    --white: #f3f3f3;
+    --silver: #bdbdbd;
+    --gray: #858585;
+    --dark-gray: #4c4c4c;
+
+    --danger: #a94b4b;
+    --success: #759d72;
+
+    --font-display: "Rajdhani", sans-serif;
+    --font-body: "Inter", sans-serif;
+
+    --max-width: 520px;
+
+    --nav-height: 72px;
+
+    --radius-small: 6px;
+    --radius: 10px;
+    --radius-large: 14px;
+
+    --transition: 0.2s ease;
+}
+
+
+/* ============================================================
+   RESET
+   ============================================================ */
+
+* {
+
+    box-sizing: border-box;
+
+    margin: 0;
+
+    padding: 0;
+
+}
+
+
+html {
+
+    width: 100%;
+    min-height: 100%;
+
+    background: var(--bg);
+
+}
+
+
+body {
+
+    width: 100%;
+    min-height: 100vh;
+
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            #17130b 0%,
+            #090909 35%,
+            #050505 100%
+        );
+
+    color: var(--white);
+
+    font-family: var(--font-body);
+
+    -webkit-font-smoothing: antialiased;
+
+}
+
+
+button,
+input,
+select {
+
+    font-family: inherit;
+
+}
+
+
+button {
+
+    border: none;
+
+    outline: none;
+
+}
+
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+
+    outline: 1px solid var(--gold);
+
+    outline-offset: 2px;
+
+}
+
+
+input,
+select {
+
+    outline: none;
+
+}
+
+
+/* ============================================================
+   APP
+   ============================================================ */
+
+#app {
+
+    width: 100%;
+
+    min-height: 100vh;
+
+}
+
+
+/* ============================================================
+   TELAS
+   ============================================================ */
+
+.screen {
+
+    width: 100%;
+
+    min-height: 100vh;
+
+}
+
+
+.hidden {
+
+    display: none !important;
+
+}
+
+
+/* ============================================================
+   LOADING
+   ============================================================ */
+
+.loading-screen {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 30px;
+
+}
+
+
+.loading-logo {
+
+    text-align: center;
+
+}
+
+
+.logo-small {
+
+    font-family: var(--font-display);
+
+    font-size: 26px;
+
+    font-weight: 700;
+
+    letter-spacing: 9px;
+
+    color: var(--silver);
+
+    margin-left: 9px;
+
+}
+
+
+.logo-main {
+
+    font-family: var(--font-display);
+
+    font-size: 70px;
+
+    line-height: 0.85;
+
+    font-weight: 700;
+
+    letter-spacing: 5px;
+
+    color: var(--gold);
+
+}
+
+
+.logo-subtitle {
+
+    margin-top: 14px;
+
+    font-family: var(--font-display);
+
+    font-size: 12px;
+
+    letter-spacing: 6px;
+
+    color: var(--gray);
+
+}
+
+
+.loading-bar {
+
+    width: min(280px, 80%);
+
+    height: 2px;
+
+    margin-top: 55px;
+
+    background: #252525;
+
+    overflow: hidden;
+
+}
+
+
+#loading-progress {
+
+    width: 0%;
+
+    height: 100%;
+
+    background: var(--gold);
+
+    transition: width 0.3s ease;
+
+}
+
+
+.loading-text {
+
+    margin-top: 14px;
+
+    color: var(--gray);
+
+    font-family: var(--font-display);
+
+    font-size: 12px;
+
+    letter-spacing: 2px;
+
+}
+
+
+/* ============================================================
+   MENU PRINCIPAL
+   ============================================================ */
+
+.menu-container {
+
+    width: 100%;
+
+    max-width: var(--max-width);
+
+    min-height: 100vh;
+
+    margin: 0 auto;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    padding: 40px 24px;
+
+}
+
+
+.brand-area {
+
+    text-align: center;
+
+    margin-bottom: 70px;
+
+}
+
+
+.brand-small {
+
+    font-family: var(--font-display);
+
+    font-size: 22px;
+
+    letter-spacing: 8px;
+
+    color: var(--silver);
+
+}
+
+
+.brand-title {
+
+    font-family: var(--font-display);
+
+    font-size: clamp(65px, 18vw, 90px);
+
+    line-height: 0.78;
+
+    letter-spacing: 4px;
+
+    color: var(--gold);
+
+    font-weight: 700;
+
+}
+
+
+.brand-line {
+
+    width: 80px;
+
+    height: 1px;
+
+    background: var(--gold);
+
+    margin: 25px auto 13px;
+
+}
+
+
+.brand-subtitle {
+
+    font-family: var(--font-display);
+
+    color: var(--silver);
+
+    font-size: 12px;
+
+    letter-spacing: 6px;
+
+}
+
+
+.brand-tagline {
+
+    margin-top: 8px;
+
+    color: var(--gray);
+
+    font-size: 10px;
+
+    letter-spacing: 2px;
+
+}
+
+
+/* ============================================================
+   MENU BUTTONS
+   ============================================================ */
+
+.menu-actions {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+}
+
+
+.menu-button {
+
+    width: 100%;
+
+    min-height: 66px;
+
+    padding: 12px 18px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    justify-content: center;
+
+    text-align: left;
+
+    background: rgba(17,17,17,0.85);
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius);
+
+    color: var(--white);
+
+    transition:
+        border-color var(--transition),
+        background var(--transition),
+        transform var(--transition);
+
+}
+
+
+.menu-button:hover {
+
+    border-color: var(--gold-dark);
+
+    background: var(--panel-light);
+
+}
+
+
+.menu-button:active {
+
+    transform: scale(0.99);
+
+}
+
+
+.menu-button span {
+
+    font-family: var(--font-display);
+
+    font-size: 19px;
+
+    font-weight: 600;
+
+    letter-spacing: 1px;
+
+}
+
+
+.menu-button small {
+
+    margin-top: 2px;
+
+    color: var(--gray);
+
+    font-size: 10px;
+
+}
+
+
+.menu-button.primary {
+
+    border-color: var(--gold-dark);
+
+}
+
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.menu-footer {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-top: 45px;
+
+    color: #555;
+
+    font-family: var(--font-display);
+
+    font-size: 10px;
+
+    letter-spacing: 1px;
+
+}
+
+
+/* ============================================================
+   GAME TOPBAR
+   ============================================================ */
+
+.game-topbar {
+
+    width: 100%;
+
+    min-height: 65px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 12px 16px;
+
+    border-bottom: 1px solid var(--border);
+
+    background: rgba(8,8,8,0.97);
+
+}
+
+
+.game-brand {
+
+    font-family: var(--font-display);
+
+    font-weight: 700;
+
+    font-size: 18px;
+
+    letter-spacing: 2px;
+
+    color: var(--gold);
+
+}
+
+
+.game-date {
+
+    margin-top: 2px;
+
+    color: var(--gray);
+
+    font-size: 10px;
+
+}
+
+
+.notification-button {
+
+    position: relative;
+
+    width: 38px;
+
+    height: 38px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border: 1px solid var(--border);
+
+    border-radius: 50%;
+
+    background: var(--panel);
+
+    color: var(--gold);
+
+}
+
+
+.notification-button i {
+
+    position: absolute;
+
+    top: -3px;
+
+    right: -3px;
+
+    min-width: 15px;
+
+    height: 15px;
+
+    padding: 0 3px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: var(--gold);
+
+    color: #111;
+
+    font-size: 8px;
+
+    font-style: normal;
+
+    font-weight: 800;
+
+}
+
+
+/* ============================================================
+   GAME CONTENT
+   ============================================================ */
+
+.game-content {
+
+    width: 100%;
+
+    min-height: calc(100vh - var(--nav-height) - 65px);
+
+    padding: 16px;
+
+    padding-bottom: calc(var(--nav-height) + 20px);
+
+}
+
+
+/* ============================================================
+   BOTTOM NAVIGATION
+   ============================================================ */
+
+.bottom-navigation {
+
+    position: fixed;
+
+    z-index: 100;
+
+    left: 50%;
+
+    bottom: 0;
+
+    transform: translateX(-50%);
+
+    width: 100%;
+
+    max-width: var(--max-width);
+
+    height: var(--nav-height);
+
+    display: grid;
+
+    grid-template-columns: repeat(5, 1fr);
+
+    background: rgba(10,10,10,0.98);
+
+    border-top: 1px solid var(--border);
+
+    backdrop-filter: blur(12px);
+
+}
+
+
+.nav-item {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 4px;
+
+    background: transparent;
+
+    color: #666;
+
+    font-family: var(--font-display);
+
+    font-size: 9px;
+
+    letter-spacing: 0.5px;
+
+    transition: color var(--transition);
+
+}
+
+
+.nav-item:hover {
+
+    color: var(--silver);
+
+}
+
+
+.nav-item.active {
+
+    color: var(--gold);
+
+}
+
+
+.nav-icon {
+
+    font-size: 16px;
+
+    line-height: 1;
+
+}
+
+
+/* ============================================================
+   SCREEN HEADER
+   ============================================================ */
+
+.screen-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 18px 16px;
+
+    border-bottom: 1px solid var(--border);
+
+}
+
+
+.screen-header h2 {
+
+    font-family: var(--font-display);
+
+    font-size: 25px;
+
+    letter-spacing: 1px;
+
+}
+
+
+.section-kicker {
+
+    color: var(--gold);
+
+    font-family: var(--font-display);
+
+    font-size: 9px;
+
+    letter-spacing: 2px;
+
+}
+
+
+/* ============================================================
+   ERROR
+   ============================================================ */
+
+.error-container {
+
+    min-height: 100vh;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    padding: 30px;
+
+}
+
+
+.error-code {
+
+    font-family: var(--font-display);
+
+    color: var(--danger);
+
+    letter-spacing: 5px;
+
+    font-size: 13px;
+
+}
+
+
+.error-container h2 {
+
+    margin-top: 10px;
+
+    font-family: var(--font-display);
+
+}
+
+
+.error-container p {
+
+    max-width: 350px;
+
+    margin: 10px auto 25px;
+
+    color: var(--gray);
+
+    font-size: 13px;
+
+}
