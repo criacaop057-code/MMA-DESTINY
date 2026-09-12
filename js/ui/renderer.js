@@ -1,538 +1,262 @@
-import { getState } from "../core/state.js";
-import { getFormattedDate } from "../engine/clock.js";
-import { getPlayerSummary } from "../player/player.js";
+import { ROUTES } from "./router.js";
 
-import {
-    statBox,
-    progressBar,
-    badge,
-    escapeHTML
-} from "./components.js";
+class Renderer {
+    constructor({ root, state, engine }) {
+        this.root = root;
+        this.state = state;
+        this.engine = engine;
 
-const content =
-    document.getElementById("game-content");
+        this.appContainer = null;
+    }
 
-export function renderGame() {
+    renderRoute(route) {
+        this.ensureContainer();
 
-    const state = getState();
+        switch (route) {
+            case ROUTES.HOME:
+                this.renderHome();
+                break;
 
-    if (!content) {
-        console.error(
-            "Elemento #game-content não encontrado."
+            case ROUTES.CAREER:
+                this.renderCareer();
+                break;
+
+            case ROUTES.WORLD:
+                this.renderWorld();
+                break;
+
+            case ROUTES.LIFE:
+                this.renderLife();
+                break;
+
+            case ROUTES.DYNASTY:
+                this.renderDynasty();
+                break;
+
+            default:
+                this.renderHome();
+        }
+    }
+
+    ensureContainer() {
+        let container = document.querySelector(
+            "#mma-destiny-app"
         );
 
-        return;
+        if (!container) {
+            container = document.createElement("main");
+            container.id = "mma-destiny-app";
+
+            this.root.appendChild(container);
+        }
+
+        this.appContainer = container;
     }
 
-    switch (state.meta.activeTab) {
+    clear() {
+        if (!this.appContainer) {
+            this.ensureContainer();
+        }
 
-        case "inicio":
-            renderHome(state);
-            break;
-
-        case "carreira":
-            renderCareer(state);
-            break;
-
-        case "mundo":
-            renderWorld(state);
-            break;
-
-        case "vida":
-            renderLife(state);
-            break;
-
-        case "dinastia":
-            renderDynasty(state);
-            break;
-
-        default:
-            renderHome(state);
+        this.appContainer.innerHTML = "";
     }
 
-    updateTopbar(state);
-}
+    createElement(tag, className = "", text = "") {
+        const element = document.createElement(tag);
 
-function updateTopbar(state) {
+        if (className) {
+            element.className = className;
+        }
 
-    const dateElement =
-        document.getElementById("game-date");
+        if (text) {
+            element.textContent = text;
+        }
 
-    if (dateElement) {
-        dateElement.textContent =
-            getFormattedDate();
+        return element;
     }
 
-    const nameElement =
-        document.getElementById("topbar-player-name");
+    renderHome() {
+        this.clear();
 
-    if (nameElement && state.player) {
-        nameElement.textContent =
-            state.player.name;
+        const section = this.createElement(
+            "section",
+            "screen screen-home"
+        );
+
+        const title = this.createElement(
+            "h1",
+            "screen-title",
+            "MMA DESTINY"
+        );
+
+        const subtitle = this.createElement(
+            "p",
+            "screen-subtitle",
+            "Sua carreira. Sua vida. Seu legado."
+        );
+
+        const date = this.getGameDate();
+
+        const dateElement = this.createElement(
+            "p",
+            "game-date",
+            `Data do mundo: ${date}`
+        );
+
+        section.append(
+            title,
+            subtitle,
+            dateElement
+        );
+
+        this.appContainer.appendChild(section);
+    }
+
+    renderCareer() {
+        this.clear();
+
+        const section = this.createElement(
+            "section",
+            "screen screen-career"
+        );
+
+        const title = this.createElement(
+            "h1",
+            "screen-title",
+            "CARREIRA"
+        );
+
+        const fighter = this.state.player;
+
+        if (fighter) {
+            const name = this.createElement(
+                "h2",
+                "fighter-name",
+                fighter.name || "Lutador"
+            );
+
+            section.append(title, name);
+        } else {
+            const message = this.createElement(
+                "p",
+                "empty-state",
+                "Nenhum lutador criado."
+            );
+
+            section.append(title, message);
+        }
+
+        this.appContainer.appendChild(section);
+    }
+
+    renderWorld() {
+        this.clear();
+
+        const section = this.createElement(
+            "section",
+            "screen screen-world"
+        );
+
+        const title = this.createElement(
+            "h1",
+            "screen-title",
+            "MUNDO"
+        );
+
+        const message = this.createElement(
+            "p",
+            "screen-subtitle",
+            "Organizações, lutadores, eventos, rankings e história."
+        );
+
+        section.append(title, message);
+
+        this.appContainer.appendChild(section);
+    }
+
+    renderLife() {
+        this.clear();
+
+        const section = this.createElement(
+            "section",
+            "screen screen-life"
+        );
+
+        const title = this.createElement(
+            "h1",
+            "screen-title",
+            "VIDA"
+        );
+
+        const message = this.createElement(
+            "p",
+            "screen-subtitle",
+            "Relacionamentos, família, patrimônio, viagens e escolhas."
+        );
+
+        section.append(title, message);
+
+        this.appContainer.appendChild(section);
+    }
+
+    renderDynasty() {
+        this.clear();
+
+        const section = this.createElement(
+            "section",
+            "screen screen-dynasty"
+        );
+
+        const title = this.createElement(
+            "h1",
+            "screen-title",
+            "DINASTIA"
+        );
+
+        const message = this.createElement(
+            "p",
+            "screen-subtitle",
+            "Família, sucessão, legado e Hall da Fama."
+        );
+
+        section.append(title, message);
+
+        this.appContainer.appendChild(section);
+    }
+
+    getGameDate() {
+        if (
+            this.engine &&
+            this.engine.calendar &&
+            typeof this.engine.calendar.getCurrentDate === "function"
+        ) {
+            return this.engine.calendar.getCurrentDate();
+        }
+
+        if (
+            this.state &&
+            this.state.calendar &&
+            this.state.calendar.currentDate
+        ) {
+            return this.state.calendar.currentDate;
+        }
+
+        return "01/01/2026";
+    }
+
+    refresh() {
+        if (
+            window.MMA_DESTINY &&
+            window.MMA_DESTINY.router
+        ) {
+            window.MMA_DESTINY.router.navigate(
+                window.MMA_DESTINY.router.getCurrentRoute(),
+                false
+            );
+        }
     }
 }
 
-function renderHome(state) {
-
-    const player =
-        state.player;
-
-    if (!player) {
-        content.innerHTML = `
-            <div class="empty-state">
-                <h2>Nenhum lutador criado</h2>
-                <p>Comece uma nova carreira.</p>
-            </div>
-        `;
-
-        return;
-    }
-
-    const record =
-        player.career.record;
-
-    content.innerHTML = `
-
-        <section class="screen-header">
-
-            <div>
-                <span class="section-kicker">
-                    CARREIRA
-                </span>
-
-                <h1>
-                    ${escapeHTML(player.name)}
-                </h1>
-
-                <p>
-                    ${escapeHTML(player.nickname || "Sem apelido")}
-                </p>
-            </div>
-
-            ${badge(
-                player.weightClass,
-                "gold"
-            )}
-
-        </section>
-
-
-        <section class="fighter-card">
-
-            <div class="fighter-avatar">
-                ${player.name
-                    .charAt(0)
-                    .toUpperCase()}
-            </div>
-
-            <div class="fighter-info">
-
-                <h2>
-                    ${escapeHTML(player.name)}
-                </h2>
-
-                <div class="fighter-meta">
-                    ${escapeHTML(player.country)}
-                    •
-                    ${player.age} anos
-                </div>
-
-                <div class="fighter-meta">
-                    ${escapeHTML(player.fightingStyle)}
-                </div>
-
-            </div>
-
-            <div class="fighter-ovr">
-
-                <span>OVR</span>
-
-                <strong>
-                    ${player.ovr}
-                </strong>
-
-            </div>
-
-        </section>
-
-
-        <section class="dashboard-grid">
-
-            ${statBox(
-                "CARTEL",
-                `${record.wins}-${record.losses}-${record.draws}`
-            )}
-
-            ${statBox(
-                "POTENCIAL",
-                player.potential
-            )}
-
-            ${statBox(
-                "IDADE",
-                `${player.age} anos`
-            )}
-
-            ${statBox(
-                "SEMANA",
-                state.calendar.week
-            )}
-
-        </section>
-
-
-        <section class="form-card">
-
-            <h2 class="card-title">
-                Estado físico
-            </h2>
-
-            ${progressBar(
-                "Saúde",
-                player.health.health
-            )}
-
-            ${progressBar(
-                "Energia",
-                player.health.energy
-            )}
-
-            ${progressBar(
-                "Fadiga",
-                100 - player.health.fatigue
-            )}
-
-        </section>
-
-
-        <section class="form-card">
-
-            <h2 class="card-title">
-                Próximo passo
-            </h2>
-
-            <p>
-                Sua carreira começa aos
-                <strong>15 anos</strong>.
-            </p>
-
-            <p>
-                Treine, desenvolva seus atributos,
-                construa sua reputação e conquiste
-                seu espaço no mundo do MMA.
-            </p>
-
-        </section>
-    `;
-}
-
-function renderCareer(state) {
-
-    const player =
-        state.player;
-
-    const record =
-        player?.career?.record ?? {
-            wins: 0,
-            losses: 0,
-            draws: 0
-        };
-
-    content.innerHTML = `
-
-        <section class="screen-header">
-
-            <div>
-                <span class="section-kicker">
-                    CARREIRA
-                </span>
-
-                <h1>
-                    Minha Carreira
-                </h1>
-
-                <p>
-                    Evolução, lutas e conquistas.
-                </p>
-            </div>
-
-        </section>
-
-
-        <section class="dashboard-grid">
-
-            ${statBox(
-                "VITÓRIAS",
-                record.wins
-            )}
-
-            ${statBox(
-                "DERROTAS",
-                record.losses
-            )}
-
-            ${statBox(
-                "EMPATES",
-                record.draws
-            )}
-
-            ${statBox(
-                "OVR",
-                player?.ovr ?? 0
-            )}
-
-        </section>
-
-
-        <section class="form-card">
-
-            <h2 class="card-title">
-                Desenvolvimento
-            </h2>
-
-            ${
-                player
-                    ? Object.entries(
-                        player.attributes
-                    )
-                    .slice(0, 8)
-                    .map(
-                        ([key, value]) =>
-                            progressBar(
-                                translateAttribute(key),
-                                value
-                            )
-                    )
-                    .join("")
-                    : ""
-            }
-
-        </section>
-
-    `;
-}
-
-function renderWorld(state) {
-
-    content.innerHTML = `
-
-        <section class="screen-header">
-
-            <div>
-                <span class="section-kicker">
-                    MUNDO
-                </span>
-
-                <h1>
-                    Mundo do MMA
-                </h1>
-
-                <p>
-                    Organizações, eventos, rankings
-                    e lutadores.
-                </p>
-            </div>
-
-        </section>
-
-
-        <section class="dashboard-grid">
-
-            ${statBox(
-                "LUTADORES",
-                state.world.fighters.length
-            )}
-
-            ${statBox(
-                "ORGANIZAÇÕES",
-                state.world.organizations.length
-            )}
-
-            ${statBox(
-                "EVENTOS",
-                state.world.events.length
-            )}
-
-            ${statBox(
-                "NOTÍCIAS",
-                state.world.news.length
-            )}
-
-        </section>
-
-
-        <section class="form-card">
-
-            <h2 class="card-title">
-                Banco de dados
-            </h2>
-
-            <p>
-                O mundo será preenchido
-                progressivamente com lutadores,
-                organizações, eventos,
-                rankings e histórico.
-            </p>
-
-        </section>
-
-    `;
-}
-
-function renderLife(state) {
-
-    const life =
-        state.life;
-
-    content.innerHTML = `
-
-        <section class="screen-header">
-
-            <div>
-                <span class="section-kicker">
-                    VIDA
-                </span>
-
-                <h1>
-                    Vida
-                </h1>
-
-                <p>
-                    Sua vida fora do cage.
-                </p>
-            </div>
-
-        </section>
-
-
-        <section class="dashboard-grid">
-
-            ${statBox(
-                "RELACIONAMENTOS",
-                life.relationships.length
-            )}
-
-            ${statBox(
-                "FILHOS",
-                life.children.length
-            )}
-
-            ${statBox(
-                "CASAS",
-                life.houses.length
-            )}
-
-            ${statBox(
-                "VEÍCULOS",
-                life.vehicles.length
-            )}
-
-        </section>
-
-
-        <section class="form-card">
-
-            <h2 class="card-title">
-                Vida pessoal
-            </h2>
-
-            <p>
-                Relacionamentos, família,
-                viagens, patrimônio e escolhas
-                pessoais serão desenvolvidos aqui.
-            </p>
-
-        </section>
-
-    `;
-}
-
-function renderDynasty(state) {
-
-    const dynasty =
-        state.dynasty;
-
-    content.innerHTML = `
-
-        <section class="screen-header">
-
-            <div>
-                <span class="section-kicker">
-                    DINASTIA
-                </span>
-
-                <h1>
-                    Dinastia
-                </h1>
-
-                <p>
-                    O legado que continuará depois de você.
-                </p>
-            </div>
-
-        </section>
-
-
-        <section class="dashboard-grid">
-
-            ${statBox(
-                "GERAÇÃO",
-                dynasty.activeGeneration
-            )}
-
-            ${statBox(
-                "LEGADO",
-                dynasty.legacyScore
-            )}
-
-            ${statBox(
-                "SUCESSORES",
-                dynasty.successors.length
-            )}
-
-            ${statBox(
-                "HALL DA FAMA",
-                dynasty.hallOfFame.length
-            )}
-
-        </section>
-
-
-        <section class="form-card">
-
-            <h2 class="card-title">
-                Linhagem
-            </h2>
-
-            <p>
-                Seus filhos poderão herdar características,
-                patrimônio, reputação e parte do potencial
-                genético da família.
-            </p>
-
-        </section>
-
-    `;
-}
-
-function translateAttribute(attribute) {
-
-    const names = {
-        striking: "Striking",
-        wrestling: "Wrestling",
-        grappling: "Grappling",
-        bjj: "Jiu-Jitsu",
-        takedownDefense: "Defesa de Quedas",
-        strikingDefense: "Defesa de Striking",
-        cardio: "Cardio",
-        strength: "Força",
-        speed: "Velocidade",
-        durability: "Durabilidade",
-        fightIQ: "Fight IQ",
-        discipline: "Disciplina",
-        confidence: "Confiança",
-        mental: "Mental"
-    };
-
-    return names[attribute] || attribute;
-}
+export {
+    Renderer
+};
