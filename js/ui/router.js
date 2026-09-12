@@ -7,7 +7,12 @@ const ROUTES = {
 };
 
 class Router {
-    constructor({ renderer, state, engine }) {
+
+    constructor({
+        renderer,
+        state,
+        engine
+    }) {
         this.renderer = renderer;
         this.state = state;
         this.engine = engine;
@@ -17,42 +22,137 @@ class Router {
     }
 
     init() {
-        if (this.initialized) return;
+        if (this.initialized) {
+            return;
+        }
 
         this.initialized = true;
 
         this.bindNavigation();
-        this.handleInitialRoute();
+        this.bindHistory();
+
+        /*
+         * A renderização inicial é feita pelo boot.
+         * Aqui apenas garantimos que o Router esteja pronto.
+         */
     }
 
     bindNavigation() {
-        document.addEventListener("click", (event) => {
-            const element = event.target.closest("[data-route]");
 
-            if (!element) return;
+        document.addEventListener(
+            "click",
+            (event) => {
 
-            event.preventDefault();
+                const element =
+                    event.target.closest(
+                        "[data-route]"
+                    );
 
-            const route = element.dataset.route;
+                if (!element) {
+                    return;
+                }
 
-            if (this.isValidRoute(route)) {
+                /*
+                 * Não interfere em elementos desabilitados.
+                 */
+                if (element.disabled) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                const route =
+                    element.dataset.route;
+
+                if (!this.isValidRoute(route)) {
+                    return;
+                }
+
                 this.navigate(route);
             }
-        });
+        );
+    }
+
+    bindHistory() {
+
+        window.addEventListener(
+            "hashchange",
+            () => {
+
+                const hash =
+                    this.getHashRoute();
+
+                if (
+                    this.isValidRoute(hash) &&
+                    hash !== this.currentRoute
+                ) {
+                    this.navigate(
+                        hash,
+                        false
+                    );
+                }
+            }
+        );
+
+        window.addEventListener(
+            "popstate",
+            () => {
+
+                const hash =
+                    this.getHashRoute();
+
+                if (
+                    this.isValidRoute(hash)
+                ) {
+                    this.navigate(
+                        hash,
+                        false
+                    );
+                } else {
+                    this.navigate(
+                        ROUTES.HOME,
+                        false
+                    );
+                }
+            }
+        );
     }
 
     handleInitialRoute() {
-        const hash = window.location.hash.replace("#", "").trim();
+
+        const hash =
+            this.getHashRoute();
 
         if (this.isValidRoute(hash)) {
-            this.navigate(hash, false);
+
+            this.navigate(
+                hash,
+                false
+            );
+
             return;
         }
 
-        this.navigate(ROUTES.HOME, false);
+        this.navigate(
+            ROUTES.HOME,
+            false
+        );
     }
 
-    navigate(route, updateHash = true) {
+    getHashRoute() {
+
+        return window.location.hash
+            .replace(/^#/, "")
+            .trim()
+            .toLowerCase();
+    }
+
+    navigate(
+        route,
+        updateHash = true
+    ) {
+
         if (!this.isValidRoute(route)) {
             route = ROUTES.HOME;
         }
@@ -60,61 +160,109 @@ class Router {
         this.currentRoute = route;
 
         if (updateHash) {
-            window.history.replaceState(
-                null,
-                "",
-                `#${route}`
-            );
+
+            const newHash =
+                `#${route}`;
+
+            if (
+                window.location.hash !==
+                newHash
+            ) {
+                window.history.pushState(
+                    {
+                        route
+                    },
+                    "",
+                    newHash
+                );
+            }
         }
 
         this.updateNavigation();
-        this.renderer.renderRoute(route);
+
+        if (
+            this.renderer &&
+            typeof this.renderer.renderRoute ===
+                "function"
+        ) {
+            this.renderer.renderRoute(
+                route
+            );
+        }
     }
 
     updateNavigation() {
-        const elements = document.querySelectorAll("[data-route]");
 
-        elements.forEach((element) => {
-            const route = element.dataset.route;
-
-            element.classList.toggle(
-                "active",
-                route === this.currentRoute
+        const elements =
+            document.querySelectorAll(
+                "[data-route]"
             );
 
-            element.setAttribute(
-                "aria-current",
-                route === this.currentRoute ? "page" : "false"
-            );
-        });
+        elements.forEach(
+            (element) => {
+
+                const route =
+                    element.dataset.route;
+
+                const active =
+                    route ===
+                    this.currentRoute;
+
+                element.classList.toggle(
+                    "active",
+                    active
+                );
+
+                element.setAttribute(
+                    "aria-current",
+                    active
+                        ? "page"
+                        : "false"
+                );
+            }
+        );
     }
 
     isValidRoute(route) {
-        return Object.values(ROUTES).includes(route);
+
+        return Object
+            .values(ROUTES)
+            .includes(route);
     }
 
     getCurrentRoute() {
+
         return this.currentRoute;
     }
 
     goHome() {
-        this.navigate(ROUTES.HOME);
+        this.navigate(
+            ROUTES.HOME
+        );
     }
 
     goCareer() {
-        this.navigate(ROUTES.CAREER);
+        this.navigate(
+            ROUTES.CAREER
+        );
     }
 
     goWorld() {
-        this.navigate(ROUTES.WORLD);
+        this.navigate(
+            ROUTES.WORLD
+        );
     }
 
     goLife() {
-        this.navigate(ROUTES.LIFE);
+        this.navigate(
+            ROUTES.LIFE
+        );
     }
 
     goDynasty() {
-        this.navigate(ROUTES.DYNASTY);
+        this.navigate(
+            ROUTES.DYNASTY
+        );
     }
 }
 
