@@ -1,1 +1,98 @@
-/* Responsive Styles */
+/* ============================================================
+   MMA DESTINY
+   RESPONSIVE.CSS
+   ============================================================ */
+
+
+/* ============================================================
+   TABLETS
+   ============================================================ */
+
+@media (min-width: 600px) {
+
+    body {
+
+        display: flex;
+
+        justify-content: center;
+
+    }
+
+
+    #app {
+
+        max-width: 520px;
+
+        box-shadow:
+            0 0 80px rgba(0,0,0,0.8);
+
+    }
+
+}
+
+
+/* ============================================================
+   TELAS PEQUENAS
+   ============================================================ */
+
+@media (max-width: 360px) {
+
+    .brand-title {
+
+        font-size: 60px;
+
+    }
+
+
+    .brand-area {
+
+        margin-bottom: 50px;
+
+    }
+
+
+    .menu-container {
+
+        padding: 30px 18px;
+
+    }
+
+
+    .game-content {
+
+        padding-left: 12px;
+
+        padding-right: 12px;
+
+    }
+
+
+    .nav-item {
+
+        font-size: 8px;
+
+    }
+
+
+    .nav-icon {
+
+        font-size: 14px;
+
+    }
+
+}
+
+
+/* ============================================================
+   TELAS MAIS ALTAS
+   ============================================================ */
+
+@media (min-height: 800px) {
+
+    .menu-container {
+
+        justify-content: center;
+
+    }
+
+}
