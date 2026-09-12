@@ -6,17 +6,11 @@ class Renderer {
         this.root = root;
         this.state = state || getState();
         this.engine = engine;
-
         this.appContainer = null;
 
         this.injectRuntimeStyles();
-
         this.bindInteractionSystem();
     }
-
-    // =========================================================
-    // SISTEMA DE INTERAÇÃO - MMA DESTINY
-    // =========================================================
 
     bindInteractionSystem() {
         if (this._interactionSystemBound) {
@@ -25,36 +19,103 @@ class Renderer {
 
         this._interactionSystemBound = true;
 
+        const handleInteraction = (event) => {
+            const path = event.composedPath
+                ? event.composedPath()
+                : [];
+
+            let button = null;
+
+            for (const element of path) {
+                if (
+                    element &&
+                    element.nodeType === 1 &&
+                    element.tagName === "BUTTON"
+                ) {
+                    button = element;
+                    break;
+                }
+            }
+
+            if (!button && event.target?.closest) {
+                button = event.target.closest("button");
+            }
+
+            if (!button || button.disabled) {
+                return;
+            }
+
+            /*
+             * ==========================================
+             * NAVEGAÇÃO PRINCIPAL
+             * ==========================================
+             */
+
+            const route = button.dataset.route;
+
+            if (route) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                const router =
+                    window.MMA_DESTINY?.router;
+
+                if (
+                    router &&
+                    typeof router.navigate === "function"
+                ) {
+                    router.navigate(route);
+                }
+
+                return;
+            }
+
+            /*
+             * ==========================================
+             * AÇÕES INTERNAS
+             * ==========================================
+             */
+
+            const action = button.dataset.mmaAction;
+
+            if (!action) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            const label =
+                button.dataset.mmaLabel ||
+                button.textContent
+                    .trim()
+                    .replace(/\s+/g, " ");
+
+            this.handleInternalAction(
+                action,
+                label,
+                button
+            );
+        };
+
+        /*
+         * pointerup:
+         * principal mecanismo para toque no iPhone.
+         */
+        document.addEventListener(
+            "pointerup",
+            handleInteraction,
+            true
+        );
+
+        /*
+         * click:
+         * fallback para navegadores/dispositivos
+         * que não utilizarem pointerup.
+         */
         document.addEventListener(
             "click",
-            (event) => {
-
-                const button =
-                    event.target.closest("button");
-
-                if (!button || button.disabled) {
-                    return;
-                }
-
-                const action =
-                    button.dataset.mmaAction;
-
-                if (!action) {
-                    return;
-                }
-
-                const label =
-                    button.dataset.mmaLabel ||
-                    button.textContent
-                        .trim()
-                        .replace(/\s+/g, " ");
-
-                this.handleInternalAction(
-                    action,
-                    label,
-                    button
-                );
-            },
+            handleInteraction,
             true
         );
     }
@@ -64,299 +125,367 @@ class Renderer {
         label,
         button
     ) {
-        console.log(
-            "[MMA DESTINY] Ação:",
-            action
-        );
-
         switch (action) {
+            /*
+             * ==========================================
+             * CARREIRA
+             * ==========================================
+             */
 
             case "training":
-                this.showActionFeedback(
+                this.openInternalScreen(
                     "TREINAMENTO",
-                    "Sistema de treinamento selecionado."
+                    "training"
                 );
                 break;
 
             case "camp":
-                this.showActionFeedback(
+                this.openInternalScreen(
                     "CAMP",
-                    "Sistema de camp selecionado."
+                    "camp"
                 );
                 break;
 
             case "fights":
-                this.showActionFeedback(
+                this.openInternalScreen(
                     "LUTAS",
-                    "Sistema de lutas selecionado."
+                    "fights"
                 );
                 break;
 
             case "contracts":
-                this.showActionFeedback(
+                this.openInternalScreen(
                     "CONTRATOS",
-                    "Sistema de contratos selecionado."
+                    "contracts"
                 );
                 break;
 
             case "rankings":
-                this.showActionFeedback(
+                this.openInternalScreen(
                     "RANKINGS",
-                    "Rankings da carreira selecionados."
+                    "rankings"
                 );
                 break;
 
             case "history":
-                this.showActionFeedback(
+                this.openInternalScreen(
                     "HISTÓRICO",
-                    "Histórico da carreira selecionado."
+                    "history"
                 );
                 break;
 
+            /*
+             * ==========================================
+             * MUNDO
+             * ==========================================
+             */
+
             case "world-fighters":
-                this.showActionFeedback(
+                this.openInternalScreen(
                     "LUTADORES",
-                    "Banco de lutadores selecionado."
+                    "world-fighters"
                 );
                 break;
 
             case "world-organizations":
-                this.showActionFeedback(
+                this.openInternalScreen(
                     "ORGANIZAÇÕES",
-                    "Banco de organizações selecionado."
+                    "world-organizations"
                 );
                 break;
 
             case "world-events":
-                this.showActionFeedback(
+                this.openInternalScreen(
                     "EVENTOS",
-                    "Banco de eventos selecionado."
+                    "world-events"
                 );
                 break;
 
             case "world-rankings":
-                this.showActionFeedback(
-                    "RANKINGS",
-                    "Rankings mundiais selecionados."
+                this.openInternalScreen(
+                    "RANKINGS MUNDIAIS",
+                    "world-rankings"
                 );
                 break;
 
             case "world-champions":
-                this.showActionFeedback(
+                this.openInternalScreen(
                     "CAMPEÕES",
-                    "Banco de campeões selecionado."
+                    "world-champions"
                 );
                 break;
 
             case "world-history":
-                this.showActionFeedback(
+                this.openInternalScreen(
                     "HISTÓRIA",
-                    "Histórico mundial selecionado."
+                    "world-history"
                 );
                 break;
 
             case "world-news":
-                this.showActionFeedback(
+                this.openInternalScreen(
                     "NOTÍCIAS",
-                    "Central de notícias selecionada."
+                    "world-news"
                 );
                 break;
 
             case "world-h2h":
-                this.showActionFeedback(
+                this.openInternalScreen(
                     "HEAD TO HEAD",
-                    "Comparador selecionado."
+                    "world-h2h"
                 );
                 break;
 
+            /*
+             * ==========================================
+             * VIDA
+             * ==========================================
+             */
+
             case "life-relationships":
-            case "life-family":
-            case "life-children":
-            case "life-house":
-            case "life-vehicles":
-            case "life-travel":
-            case "life-education":
-            case "life-finance":
-            case "life-academy":
-
-                this.showActionFeedback(
-                    label,
-                    "Módulo selecionado."
+                this.openInternalScreen(
+                    "RELACIONAMENTOS",
+                    "life-relationships"
                 );
+                break;
 
+            case "life-family":
+                this.openInternalScreen(
+                    "FAMÍLIA",
+                    "life-family"
+                );
+                break;
+
+            case "life-children":
+                this.openInternalScreen(
+                    "FILHOS",
+                    "life-children"
+                );
+                break;
+
+            case "life-house":
+                this.openInternalScreen(
+                    "CASA",
+                    "life-house"
+                );
+                break;
+
+            case "life-vehicles":
+                this.openInternalScreen(
+                    "VEÍCULOS",
+                    "life-vehicles"
+                );
+                break;
+
+            case "life-travel":
+                this.openInternalScreen(
+                    "VIAGENS",
+                    "life-travel"
+                );
+                break;
+
+            case "life-education":
+                this.openInternalScreen(
+                    "EDUCAÇÃO",
+                    "life-education"
+                );
+                break;
+
+            case "life-finance":
+                this.openInternalScreen(
+                    "FINANÇAS",
+                    "life-finance"
+                );
+                break;
+
+            case "life-academy":
+                this.openInternalScreen(
+                    "ACADEMIA",
+                    "life-academy"
+                );
                 break;
 
             default:
                 console.warn(
-                    "[MMA DESTINY] Ação desconhecida:",
+                    "[MMA DESTINY] Ação não reconhecida:",
                     action
+                );
+
+                this.showActionFeedback(
+                    label || action
                 );
         }
     }
 
-    showActionFeedback(
+    openInternalScreen(
         title,
-        message
+        screen
     ) {
-        const old =
+        console.log(
+            "[MMA DESTINY] Abrindo tela:",
+            screen
+        );
+
+        /*
+         * A tela interna será renderizada na própria
+         * estrutura do jogo.
+         *
+         * Nesta primeira etapa mantemos o estado atual
+         * e criamos uma camada interna segura.
+         */
+        this.currentInternalScreen = screen;
+
+        this.renderInternalScreen(
+            title,
+            screen
+        );
+    }
+
+    showActionFeedback(label) {
+        const existing =
             document.querySelector(
-                "#mma-destiny-feedback"
+                ".mma-action-feedback"
             );
 
-        if (old) {
-            old.remove();
+        if (existing) {
+            existing.remove();
         }
 
         const feedback =
             document.createElement("div");
 
-        feedback.id =
-            "mma-destiny-feedback";
+        feedback.className =
+            "mma-action-feedback";
 
-        feedback.innerHTML = `
-            <strong>
-                ${this.safe(title)}
-            </strong>
-
-            <span>
-                ${this.safe(message)}
-            </span>
-        `;
+        feedback.textContent =
+            `${label} selecionado`;
 
         Object.assign(
             feedback.style,
             {
                 position: "fixed",
                 left: "50%",
-                bottom: "100px",
-                transform:
-                    "translateX(-50%)",
+                bottom: "90px",
+                transform: "translateX(-50%)",
                 zIndex: "10000",
                 padding: "12px 18px",
-                border:
-                    "1px solid rgba(255,255,255,.15)",
                 borderRadius: "10px",
-                background:
-                    "rgba(10,10,10,.95)",
+                background: "#111",
                 color: "#fff",
-                display: "flex",
-                flexDirection: "column",
-                gap: "4px",
-                minWidth: "220px",
-                maxWidth:
-                    "calc(100vw - 40px)",
-                boxShadow:
-                    "0 12px 40px rgba(0,0,0,.45)",
-                textAlign: "center",
+                fontSize: "14px",
+                fontWeight: "600",
                 pointerEvents: "none"
             }
         );
 
-        document.body.appendChild(
-            feedback
-        );
+        document.body.appendChild(feedback);
 
-        setTimeout(() => {
-            if (feedback.parentNode) {
-                feedback.remove();
-            }
+        window.setTimeout(() => {
+            feedback.remove();
         }, 1800);
     }
+        renderInternalScreen(title, screen) {
+        const container = this.ensureContainer();
 
-    // =========================================================
-    // ESTADO REAL DO JOGO
-    // =========================================================
-
-    syncState() {
-        const currentState =
-            getState();
-
-        if (currentState) {
-            this.state =
-                currentState;
-        }
-
-        return this.state;
-    }
-
-    // =========================================================
-    // AVANÇAR SEMANA
-    // =========================================================
-
-    async advanceWeek(button) {
-
-        if (!this.engine) {
-            console.error(
-                "[MMA DESTINY] Engine não encontrado."
-            );
+        if (!container) {
             return;
         }
 
-        if (
-            button &&
-            button.disabled
-        ) {
-            return;
-        }
+        container.innerHTML = "";
 
-        if (button) {
-            button.disabled = true;
+        const section =
+            document.createElement("section");
 
-            button.dataset.originalText =
-                button.textContent;
+        section.className =
+            "destiny-internal-screen";
 
-            button.textContent =
-                "SIMULANDO...";
-        }
+        const header =
+            document.createElement("div");
 
-        try {
+        header.className =
+            "destiny-internal-header";
 
-            await this.engine.advanceWeek();
+        const backButton =
+            document.createElement("button");
 
-            this.syncState();
+        backButton.type = "button";
+        backButton.className =
+            "destiny-secondary-button";
 
-            const route =
-                window.MMA_DESTINY?.router
-                    ?.getCurrentRoute();
+        backButton.textContent =
+            "← VOLTAR";
 
-            if (route) {
+        backButton.addEventListener(
+            "click",
+            () => {
+                this.currentInternalScreen = null;
+
+                const route =
+                    window.MMA_DESTINY
+                        ?.router
+                        ?.getCurrentRoute?.()
+                    || ROUTES.HOME;
+
                 this.renderRoute(route);
-            } else {
-                this.renderHome();
             }
+        );
 
-        } catch (error) {
+        const heading =
+            document.createElement("h1");
 
-            console.error(
-                "[MMA DESTINY] Erro ao avançar semana:",
-                error
-            );
+        heading.className =
+            "destiny-section-title";
 
-            alert(
-                "Não foi possível avançar a semana.\n\n" +
-                (
-                    error?.message ||
-                    "Erro desconhecido."
-                )
-            );
+        heading.textContent = title;
 
-        } finally {
+        header.appendChild(backButton);
+        header.appendChild(heading);
 
-            if (button) {
-                button.disabled = false;
+        const content =
+            document.createElement("div");
 
-                button.textContent =
-                    button.dataset.originalText ||
-                    "AVANÇAR SEMANA";
-            }
-        }
+        content.className =
+            "destiny-internal-content";
+
+        /*
+         * Por enquanto, algumas telas ainda não possuem
+         * um módulo de jogo próprio. Esta estrutura garante
+         * que a ação abra uma tela real em vez de apenas
+         * mostrar um toast.
+         */
+
+        const message =
+            document.createElement("div");
+
+        message.className =
+            "destiny-empty-state";
+
+        message.innerHTML = `
+            <h2>${title}</h2>
+            <p>
+                Módulo <strong>${screen}</strong>
+                carregado.
+            </p>
+        `;
+
+        content.appendChild(message);
+
+        section.appendChild(header);
+        section.appendChild(content);
+
+        container.appendChild(section);
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
     }
-
-    // =========================================================
-    // BASE
-    // =========================================================
 
     ensureContainer() {
+        if (this.appContainer) {
+            return this.appContainer;
+        }
+
         let container =
             document.querySelector(
                 "#app-content"
@@ -371,82 +500,154 @@ class Renderer {
 
         if (!container) {
             container =
-                document.createElement(
-                    "main"
-                );
+                document.createElement("main");
 
             container.id =
                 "app-content";
 
-            this.root.appendChild(
+            document.body.appendChild(
                 container
             );
         }
 
-        this.appContainer =
-            container;
+        this.appContainer = container;
+
+        return container;
     }
 
-    clear() {
-        this.ensureContainer();
+    syncState() {
+        if (!this.state) {
+            this.state = getState();
+        }
 
-        this.appContainer.innerHTML = "";
+        return this.state;
     }
 
-    el(
-        tag,
-        className = "",
-        text = ""
-    ) {
-        const element =
-            document.createElement(tag);
+    async advanceWeek(button) {
+        if (!this.engine) {
+            console.error(
+                "[MMA DESTINY] Engine não encontrada."
+            );
 
-        if (className) {
-            element.className =
-                className;
+            return;
         }
 
-        if (text !== "") {
-            element.textContent =
-                text;
+        if (
+            button &&
+            button.disabled
+        ) {
+            return;
         }
 
-        return element;
+        const originalText =
+            button?.textContent ||
+            "AVANÇAR SEMANA";
+
+        try {
+            if (button) {
+                button.disabled = true;
+                button.textContent =
+                    "SIMULANDO...";
+            }
+
+            console.log(
+                "[MMA DESTINY] Avançando semana..."
+            );
+
+            await this.engine.advanceWeek();
+
+            this.syncState();
+
+            console.log(
+                "[MMA DESTINY] Semana avançada."
+            );
+
+            const router =
+                window.MMA_DESTINY?.router;
+
+            const route =
+                router?.getCurrentRoute?.()
+                || ROUTES.HOME;
+
+            this.renderRoute(route);
+
+        } catch (error) {
+            console.error(
+                "[MMA DESTINY] Erro ao avançar semana:",
+                error
+            );
+
+            if (button) {
+                button.disabled = false;
+                button.textContent =
+                    originalText;
+            }
+
+            this.showActionFeedback(
+                "Erro ao avançar a semana"
+            );
+
+            return;
+
+        } finally {
+            /*
+             * Se renderRoute() já recriou o botão,
+             * este elemento pode não estar mais no DOM.
+             */
+            if (
+                button &&
+                document.body.contains(button)
+            ) {
+                button.disabled = false;
+                button.textContent =
+                    originalText;
+            }
+        }
     }
 
     button(
-        text,
-        className = "",
+        label,
+        className = "destiny-secondary-button",
         action = null
     ) {
         const button =
-            this.el(
-                "button",
-                className,
-                text
-            );
+            document.createElement("button");
 
         button.type = "button";
+        button.className = className;
+        button.textContent = label;
 
         if (action) {
-            button.addEventListener(
-                "click",
-                action
-            );
+            button.dataset.mmaAction =
+                action;
+
+            button.dataset.mmaLabel =
+                label;
         }
 
         return button;
     }
 
-    // =========================================================
-    // RENDER PRINCIPAL
-    // =========================================================
+    quickButton(label, route) {
+        const button =
+            this.button(
+                label,
+                "destiny-secondary-button"
+            );
+
+        /*
+         * O router agora recebe a rota através
+         * do sistema central de interação.
+         */
+        button.dataset.route = route;
+
+        return button;
+    }
 
     renderRoute(route) {
-        this.ensureContainer();
+        this.currentInternalScreen = null;
 
         switch (route) {
-
             case ROUTES.HOME:
                 this.renderHome();
                 break;
@@ -469,103 +670,67 @@ class Renderer {
 
             default:
                 this.renderHome();
+                break;
+        }
+
+        /*
+         * Mantém a navegação inferior sincronizada
+         * com a tela atual.
+         */
+        if (
+            window.MMA_DESTINY?.router
+                ?.updateNavigation
+        ) {
+            window.MMA_DESTINY.router
+                .updateNavigation();
         }
     }
+        renderHome() {
+        const container =
+            this.ensureContainer();
 
-    // =========================================================
-    // INÍCIO
-    // =========================================================
+        container.innerHTML = "";
 
-    renderHome() {
-        this.clear();
+        const wrapper =
+            document.createElement("div");
 
-        const player =
-            this.getPlayer();
+        wrapper.className =
+            "destiny-home";
 
-        const section =
-            this.el(
-                "section",
-                "destiny-screen"
-            );
-
-        // -----------------------------------------------------
-        // HEADER
-        // -----------------------------------------------------
+        /*
+         * ==========================================
+         * CABEÇALHO
+         * ==========================================
+         */
 
         const header =
-            this.el(
-                "div",
-                "destiny-header"
-            );
+            document.createElement("header");
 
-        const brand =
-            this.el(
-                "div",
-                "destiny-brand"
-            );
+        header.className =
+            "destiny-header";
 
-        brand.innerHTML = `
-            <span class="destiny-brand-main">
-                MMA
-            </span>
+        const title =
+            document.createElement("h1");
 
-            <span class="destiny-brand-accent">
-                DESTINY
-            </span>
-        `;
+        title.textContent =
+            "MMA DESTINY";
 
-        const date =
-            this.el(
-                "div",
-                "destiny-date",
-                this.formatDate(
-                    this.getGameDate()
-                )
-            );
+        const subtitle =
+            document.createElement("p");
 
-        header.append(
-            brand,
-            date
-        );
+        subtitle.textContent =
+            "Viva sua carreira. Construa sua vida. Deixe seu legado.";
 
-        // -----------------------------------------------------
-        // HERO
-        // -----------------------------------------------------
+        header.appendChild(title);
+        header.appendChild(subtitle);
 
-        const hero =
-            this.el(
-                "div",
-                "destiny-hero"
-            );
+        /*
+         * ==========================================
+         * CRIAÇÃO DO LUTADOR
+         * ==========================================
+         */
 
-        const heroTitle =
-            this.el(
-                "h1",
-                "destiny-hero-title",
-                player?.name ||
-                "COMECE SUA HISTÓRIA"
-            );
-
-        const heroSubtitle =
-            this.el(
-                "p",
-                "",
-                player
-                    ? "Sua carreira. Sua vida. Seu legado."
-                    : "O mundo do MMA está esperando por você."
-            );
-
-        hero.append(
-            heroTitle,
-            heroSubtitle
-        );
-
-        // -----------------------------------------------------
-        // CRIAÇÃO DE LUTADOR
-        // -----------------------------------------------------
-
-        if (!player) {
-
+        if (!this.state.player) {
             const createButton =
                 this.button(
                     "CRIAR LUTADOR",
@@ -579,463 +744,441 @@ class Renderer {
                 }
             );
 
-            hero.appendChild(
-                createButton
-            );
+            wrapper.appendChild(header);
+            wrapper.appendChild(createButton);
+
+            container.appendChild(wrapper);
+
+            return;
         }
 
-        // -----------------------------------------------------
-        // PERFIL
-        // -----------------------------------------------------
+        /*
+         * ==========================================
+         * PERFIL DO LUTADOR
+         * ==========================================
+         */
 
-        const profileCard =
-            this.el(
-                "div",
-                "destiny-card destiny-profile"
-            );
+        const player =
+            this.state.player;
 
-        if (player) {
+        const profile =
+            document.createElement("section");
 
-            profileCard.innerHTML = `
-                <div class="destiny-card-label">
-                    ATLETA
-                </div>
+        profile.className =
+            "destiny-profile-card";
 
-                <div class="fighter-main">
+        const playerName =
+            document.createElement("h2");
 
-                    <div class="fighter-avatar">
-                        ${this.safe(
-                            this.getInitials(
-                                player.name
-                            )
-                        )}
-                    </div>
+        playerName.textContent =
+            player.name ||
+            "Lutador";
 
-                    <div class="fighter-info">
+        const playerInfo =
+            document.createElement("p");
 
-                        <h2>
-                            ${this.safe(
-                                player.name ||
-                                "Lutador"
-                            )}
-                        </h2>
+        playerInfo.textContent =
+            `${player.age || 15} anos • ` +
+            `${player.country || "Brasil"} • ` +
+            `${player.weightClass || "Peso médio"}`;
 
-                        <p>
-                            ${this.safe(
-                                player.nickname ||
-                                "Sem apelido"
-                            )}
-                        </p>
+        profile.appendChild(playerName);
+        profile.appendChild(playerInfo);
 
-                    </div>
-
-                </div>
-
-                <div class="fighter-grid">
-
-                    <div>
-                        <span>IDADE</span>
-                        <strong>
-                            ${this.getPlayerAge(
-                                player
-                            )}
-                        </strong>
-                    </div>
-
-                    <div>
-                        <span>OVR</span>
-                        <strong>
-                            ${this.getOverall(
-                                player
-                            )}
-                        </strong>
-                    </div>
-
-                    <div>
-                        <span>RECORD</span>
-                        <strong>
-                            ${this.getRecord(
-                                player
-                            )}
-                        </strong>
-                    </div>
-
-                    <div>
-                        <span>CATEGORIA</span>
-                        <strong>
-                            ${this.safe(
-                                this.getWeightClass(
-                                    player
-                                )
-                            )}
-                        </strong>
-                    </div>
-
-                </div>
-            `;
-
-        } else {
-
-            profileCard.innerHTML = `
-                <div class="destiny-card-label">
-                    NOVA CARREIRA
-                </div>
-
-                <h2>
-                    Sua jornada começa aos 15 anos.
-                </h2>
-
-                <p>
-                    Crie seu lutador, escolha seu estilo,
-                    desenvolva seus atributos e construa
-                    sua trajetória do amador ao topo do MMA.
-                </p>
-
-                <div class="creation-features">
-
-                    <div>
-                        <strong>15</strong>
-                        <span>IDADE INICIAL</span>
-                    </div>
-
-                    <div>
-                        <strong>14+</strong>
-                        <span>ATRIBUTOS</span>
-                    </div>
-
-                    <div>
-                        <strong>∞</strong>
-                        <span>LEGADO</span>
-                    </div>
-
-                </div>
-            `;
-        }
-
-        // -----------------------------------------------------
-        // STATUS
-        // -----------------------------------------------------
+        /*
+         * ==========================================
+         * STATUS
+         * ==========================================
+         */
 
         const statusGrid =
-            this.el(
-                "div",
-                "destiny-status-grid"
-            );
+            document.createElement("div");
 
-        statusGrid.append(
-            this.statCard(
+        statusGrid.className =
+            "destiny-status-grid";
+
+        const statusItems = [
+            [
+                "VITÓRIAS",
+                player.record?.wins ?? 0
+            ],
+            [
+                "DERROTAS",
+                player.record?.losses ?? 0
+            ],
+            [
+                "EMPATES",
+                player.record?.draws ?? 0
+            ],
+            [
                 "SAÚDE",
-                this.getHealth(
-                    player
-                ),
-                "%"
-            ),
-
-            this.statCard(
+                player.health ?? 100
+            ],
+            [
                 "FADIGA",
-                this.getFatigue(
-                    player
-                ),
-                "%"
-            ),
+                player.fatigue ?? 0
+            ]
+        ];
 
-            this.statCard(
-                "DINHEIRO",
-                this.getMoney(),
-                ""
-            ),
+        statusItems.forEach(
+            ([label, value]) => {
+                const item =
+                    document.createElement("div");
 
-            this.statCard(
-                "HYPE",
-                this.getHype(
-                    player
-                ),
-                ""
-            )
+                item.className =
+                    "destiny-status-item";
+
+                const itemLabel =
+                    document.createElement("span");
+
+                itemLabel.textContent =
+                    label;
+
+                const itemValue =
+                    document.createElement("strong");
+
+                itemValue.textContent =
+                    value;
+
+                item.appendChild(itemLabel);
+                item.appendChild(itemValue);
+
+                statusGrid.appendChild(item);
+            }
         );
 
-        // -----------------------------------------------------
-        // PRÓXIMO EVENTO
-        // -----------------------------------------------------
+        /*
+         * ==========================================
+         * PRÓXIMO EVENTO
+         * ==========================================
+         */
 
-        const eventCard =
-            this.el(
-                "div",
-                "destiny-card destiny-next-event"
-            );
+        const nextEvent =
+            document.createElement("section");
 
-        eventCard.innerHTML = `
-            <div class="destiny-card-label">
-                PRÓXIMO COMPROMISSO
-            </div>
+        nextEvent.className =
+            "destiny-next-event";
 
-            <h2>
-                ${this.safe(
-                    this.getNextEvent()
-                )}
-            </h2>
+        const eventTitle =
+            document.createElement("h3");
 
-            <p>
-                ${this.safe(
-                    this.getNextEventDescription()
-                )}
-            </p>
-        `;
+        eventTitle.textContent =
+            "PRÓXIMO EVENTO";
 
-        // -----------------------------------------------------
-        // AVANÇAR SEMANA
-        // -----------------------------------------------------
+        const eventText =
+            document.createElement("p");
 
-        const advanceButton =
+        const event =
+            this.state.nextEvent ||
+            this.state.currentEvent;
+
+        if (event) {
+            eventText.textContent =
+                event.name ||
+                event.title ||
+                "Nenhum evento definido";
+        } else {
+            eventText.textContent =
+                "Nenhum evento agendado";
+        }
+
+        nextEvent.appendChild(eventTitle);
+        nextEvent.appendChild(eventText);
+
+        /*
+         * ==========================================
+         * AVANÇAR SEMANA
+         * ==========================================
+         */
+
+        const nextWeekButton =
             this.button(
                 "AVANÇAR SEMANA",
                 "destiny-primary-button"
             );
 
-        advanceButton.addEventListener(
+        nextWeekButton.dataset.mmaAction =
+            "advance-week";
+
+        nextWeekButton.dataset.mmaLabel =
+            "AVANÇAR SEMANA";
+
+        /*
+         * Listener direto para garantir que
+         * esta ação nunca dependa apenas do
+         * sistema de ações internas.
+         */
+        nextWeekButton.addEventListener(
             "click",
-            () => {
-                this.advanceWeek(
-                    advanceButton
+            async (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                await this.advanceWeek(
+                    nextWeekButton
                 );
             }
         );
 
-        // -----------------------------------------------------
-        // MENU RÁPIDO
-        // -----------------------------------------------------
+        /*
+         * ==========================================
+         * ACESSO RÁPIDO
+         * ==========================================
+         */
+
+        const quickSection =
+            document.createElement("section");
+
+        quickSection.className =
+            "destiny-quick-section";
+
+        const quickTitle =
+            document.createElement("h3");
+
+        quickTitle.textContent =
+            "ACESSO RÁPIDO";
 
         const quickActions =
-            this.el(
-                "div",
-                "destiny-quick-actions"
-            );
+            document.createElement("div");
 
-        quickActions.append(
-            this.quickButton(
+        quickActions.className =
+            "destiny-quick-actions";
+
+        const quickButtons = [
+            [
                 "CARREIRA",
                 ROUTES.CAREER
-            ),
-
-            this.quickButton(
+            ],
+            [
                 "MUNDO",
                 ROUTES.WORLD
-            ),
-
-            this.quickButton(
+            ],
+            [
                 "VIDA",
                 ROUTES.LIFE
-            ),
-
-            this.quickButton(
+            ],
+            [
                 "DINASTIA",
                 ROUTES.DYNASTY
-            )
+            ]
+        ];
+
+        quickButtons.forEach(
+            ([label, route]) => {
+                quickActions.appendChild(
+                    this.quickButton(
+                        label,
+                        route
+                    )
+                );
+            }
         );
 
-        // -----------------------------------------------------
-        // MONTAGEM
-        // -----------------------------------------------------
+        quickSection.appendChild(
+            quickTitle
+        );
 
-        section.append(
-            header,
-            hero,
-            profileCard,
-            statusGrid,
-            eventCard,
-            advanceButton,
+        quickSection.appendChild(
             quickActions
         );
 
-        this.appContainer.appendChild(
-            section
-        );
+        /*
+         * ==========================================
+         * MONTAGEM FINAL
+         * ==========================================
+         */
+
+        wrapper.appendChild(header);
+        wrapper.appendChild(profile);
+        wrapper.appendChild(statusGrid);
+        wrapper.appendChild(nextEvent);
+        wrapper.appendChild(nextWeekButton);
+        wrapper.appendChild(quickSection);
+
+        container.appendChild(wrapper);
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
     }
 
-    // =========================================================
-    // CRIAÇÃO DO LUTADOR
-    // =========================================================
-
     openFighterCreation() {
-
         const overlay =
-            this.el(
-                "div",
-                "fighter-creation-overlay"
-            );
+            document.createElement("div");
+
+        overlay.className =
+            "fighter-creation-overlay";
 
         const modal =
-            this.el(
-                "div",
-                "fighter-creation-modal"
-            );
+            document.createElement("div");
 
-        modal.innerHTML = `
-            <div class="destiny-card-label">
-                NOVA CARREIRA
-            </div>
+        modal.className =
+            "fighter-creation-modal";
 
-            <h2>
-                CRIAR LUTADOR
-            </h2>
+        const title =
+            document.createElement("h2");
 
-            <p class="creation-description">
-                Sua jornada começa aos 15 anos.
-            </p>
+        title.textContent =
+            "CRIAR LUTADOR";
 
-            <div class="creation-form">
+        const form =
+            document.createElement("form");
 
-                <label>
-                    NOME
+        form.className =
+            "fighter-creation-form";
 
-                    <input
-                        id="creation-name"
-                        type="text"
-                        placeholder="Nome do atleta"
-                        maxlength="40"
-                    >
-                </label>
+        /*
+         * NOME
+         */
 
-                <label>
-                    APELIDO
+        const nameLabel =
+            document.createElement("label");
 
-                    <input
-                        id="creation-nickname"
-                        type="text"
-                        placeholder="Apelido"
-                        maxlength="30"
-                    >
-                </label>
+        nameLabel.textContent =
+            "Nome do atleta";
 
-                <label>
-                    CATEGORIA
+        const nameInput =
+            document.createElement("input");
 
-                    <select id="creation-weight">
+        nameInput.type = "text";
+        nameInput.name = "name";
+        nameInput.required = true;
+        nameInput.placeholder =
+            "Digite o nome";
 
-                        <option value="strawweight">
-                            Strawweight
-                        </option>
-
-                        <option value="flyweight">
-                            Flyweight
-                        </option>
-
-                        <option value="bantamweight">
-                            Bantamweight
-                        </option>
-
-                        <option value="featherweight">
-                            Featherweight
-                        </option>
-
-                        <option
-                            value="lightweight"
-                            selected
-                        >
-                            Lightweight
-                        </option>
-
-                        <option value="welterweight">
-                            Welterweight
-                        </option>
-
-                        <option value="middleweight">
-                            Middleweight
-                        </option>
-
-                        <option value="light_heavyweight">
-                            Light Heavyweight
-                        </option>
-
-                        <option value="heavyweight">
-                            Heavyweight
-                        </option>
-
-                    </select>
-                </label>
-
-                <label>
-                    ESTILO
-
-                    <select id="creation-style">
-
-                        <option
-                            value="balanced"
-                            selected
-                        >
-                            Balanced
-                        </option>
-
-                        <option value="striker">
-                            Striker
-                        </option>
-
-                        <option value="wrestler">
-                            Wrestler
-                        </option>
-
-                        <option value="grappler">
-                            Grappler
-                        </option>
-
-                        <option value="counter_striker">
-                            Counter Striker
-                        </option>
-
-                        <option value="pressure_fighter">
-                            Pressure Fighter
-                        </option>
-
-                        <option value="submission_hunter">
-                            Submission Hunter
-                        </option>
-
-                        <option value="ground_and_pound">
-                            Ground & Pound
-                        </option>
-
-                    </select>
-                </label>
-
-            </div>
-
-            <div class="creation-actions">
-
-                <button
-                    type="button"
-                    class="destiny-secondary-button"
-                    id="creation-cancel"
-                >
-                    CANCELAR
-                </button>
-
-                <button
-                    type="button"
-                    class="destiny-primary-button"
-                    id="creation-confirm"
-                >
-                    COMEÇAR CARREIRA
-                </button>
-
-            </div>
-        `;
-
-        overlay.appendChild(
-            modal
+        nameLabel.appendChild(
+            nameInput
         );
 
-        document.body.appendChild(
-            overlay
+        /*
+         * PAÍS
+         */
+
+        const countryLabel =
+            document.createElement("label");
+
+        countryLabel.textContent =
+            "País";
+
+        const countryInput =
+            document.createElement("input");
+
+        countryInput.type = "text";
+        countryInput.name = "country";
+        countryInput.value =
+            "Brasil";
+
+        countryLabel.appendChild(
+            countryInput
         );
+
+        /*
+         * CATEGORIA
+         */
+
+        const weightLabel =
+            document.createElement("label");
+
+        weightLabel.textContent =
+            "Categoria de peso";
+
+        const weightSelect =
+            document.createElement("select");
+
+        weightSelect.name =
+            "weightClass";
+
+        [
+            "Peso mosca",
+            "Peso galo",
+            "Peso pena",
+            "Peso leve",
+            "Peso meio-médio",
+            "Peso médio",
+            "Peso meio-pesado",
+            "Peso pesado"
+        ].forEach(
+            (weight) => {
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+                option.value =
+                    weight;
+
+                option.textContent =
+                    weight;
+
+                weightSelect.appendChild(
+                    option
+                );
+            }
+        );
+
+        weightLabel.appendChild(
+            weightSelect
+        );
+
+        /*
+         * ESTILO
+         */
+
+        const styleLabel =
+            document.createElement("label");
+
+        styleLabel.textContent =
+            "Estilo de luta";
+
+        const styleSelect =
+            document.createElement("select");
+
+        styleSelect.name =
+            "style";
+
+        [
+            "Striker",
+            "Wrestler",
+            "Grappler",
+            "MMA Completo"
+        ].forEach(
+            (style) => {
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+                option.value =
+                    style;
+
+                option.textContent =
+                    style;
+
+                styleSelect.appendChild(
+                    option
+                );
+            }
+        );
+
+        styleLabel.appendChild(
+            styleSelect
+        );
+
+        /*
+         * BOTÕES
+         */
+
+        const actions =
+            document.createElement("div");
+
+        actions.className =
+            "fighter-creation-actions";
 
         const cancelButton =
-            modal.querySelector(
-                "#creation-cancel"
-            );
-
-        const confirmButton =
-            modal.querySelector(
-                "#creation-confirm"
+            this.button(
+                "CANCELAR",
+                "destiny-secondary-button"
             );
 
         cancelButton.addEventListener(
@@ -1045,255 +1188,169 @@ class Renderer {
             }
         );
 
-        confirmButton.addEventListener(
-            "click",
-            () => {
+        const confirmButton =
+            this.button(
+                "CRIAR LUTADOR",
+                "destiny-primary-button"
+            );
+
+        confirmButton.type =
+            "submit";
+
+        actions.appendChild(
+            cancelButton
+        );
+
+        actions.appendChild(
+            confirmButton
+        );
+
+        /*
+         * SUBMIT
+         */
+
+        form.addEventListener(
+            "submit",
+            (event) => {
+                event.preventDefault();
+
+                const formData =
+                    new FormData(form);
+
                 this.createPlayerFromForm(
-                    modal,
-                    overlay
+                    formData
                 );
+
+                overlay.remove();
+
+                this.syncState();
+                this.renderHome();
             }
+        );
+
+        form.appendChild(nameLabel);
+        form.appendChild(countryLabel);
+        form.appendChild(weightLabel);
+        form.appendChild(styleLabel);
+        form.appendChild(actions);
+
+        modal.appendChild(title);
+        modal.appendChild(form);
+
+        overlay.appendChild(modal);
+
+        document.body.appendChild(
+            overlay
         );
     }
 
-    createPlayerFromForm(
-        modal,
-        overlay
-    ) {
+    createPlayerFromForm(formData) {
         const name =
-            modal.querySelector(
-                "#creation-name"
-            )?.value.trim();
+            formData.get("name") ||
+            "Novo Lutador";
 
-        const nickname =
-            modal.querySelector(
-                "#creation-nickname"
-            )?.value.trim();
+        const country =
+            formData.get("country") ||
+            "Brasil";
 
         const weightClass =
-            modal.querySelector(
-                "#creation-weight"
-            )?.value;
+            formData.get("weightClass") ||
+            "Peso médio";
 
         const style =
-            modal.querySelector(
-                "#creation-style"
-            )?.value;
+            formData.get("style") ||
+            "MMA Completo";
 
-        if (!name) {
-            alert(
-                "Digite o nome do seu lutador."
-            );
+        const attributes = {
+            strength: 50,
+            striking: 50,
+            wrestling: 50,
+            grappling: 50,
+            technique: 50,
+            cardio: 50,
+            defense: 50,
+            fightIQ: 50,
+            mental: 50,
+            discipline: 50,
+            confidence: 50
+        };
 
-            return;
-        }
-
-        const player = {
-
-            id:
-                `player_${Date.now()}`,
-
+        this.state.player = {
             name,
-
-            nickname:
-                nickname ||
-                "Sem apelido",
-
-            age: 15,
-
-            birthDate:
-                this.calculateBirthDateForAge15(),
-
-            gender: "male",
-
+            country,
             weightClass,
-
             style,
-
-            attributes: {
-
-                striking: 50,
-
-                wrestling: 50,
-
-                grappling: 50,
-
-                bjj: 50,
-
-                takedownDefense: 50,
-
-                strikingDefense: 50,
-
-                cardio: 50,
-
-                strength: 50,
-
-                speed: 50,
-
-                durability: 50,
-
-                fightIQ: 50,
-
-                discipline: 50,
-
-                confidence: 50,
-
-                mental: 50
-            },
-
-            overall: 50,
-
+            age: 15,
+            attributes,
             potential: 85,
-
             record: {
                 wins: 0,
                 losses: 0,
                 draws: 0
             },
-
-            health: {
-                current: 100,
-                fatigue: 0
-            },
-
-            fatigue: 0,
-
-            hype: 0,
-
-            ranking: null,
-
-            status: "amateur",
-
-            careerStage: "amateur"
+            health: 100,
+            fatigue: 0
         };
 
-        this.state.player =
-            player;
-
-        this.syncState();
-
-        overlay.remove();
-
-        this.renderHome();
-    }
-
-    calculateBirthDateForAge15() {
-
-        const current =
-            new Date(
-                this.getGameDate()
-            );
-
-        current.setFullYear(
-            current.getFullYear() - 15
+        console.log(
+            "[MMA DESTINY] Lutador criado:",
+            this.state.player
         );
 
-        return current
-            .toISOString()
-            .slice(0, 10);
+        /*
+         * Se o State Manager possuir uma função
+         * própria para atualizar o jogador,
+         * utilizamos quando disponível.
+         */
+        if (
+            typeof this.state.setPlayer ===
+            "function"
+        ) {
+            this.state.setPlayer(
+                this.state.player
+            );
+        }
+
+        return this.state.player;
     }
+        renderCareer() {
+        const container =
+            this.ensureContainer();
 
-    // =========================================================
-    // CARREIRA
-    // =========================================================
+        container.innerHTML = "";
 
-    renderCareer() {
+        const wrapper =
+            document.createElement("div");
 
-        this.clear();
+        wrapper.className =
+            "destiny-career";
 
-        const player =
-            this.getPlayer();
+        const header =
+            document.createElement("header");
 
-        const section =
-            this.createScreen(
-                "CARREIRA",
-                "Construa seu caminho até o topo."
-            );
+        header.className =
+            "destiny-section-header";
 
-        const overview =
-            this.el(
-                "div",
-                "destiny-card"
-            );
+        const title =
+            document.createElement("h1");
 
-        overview.innerHTML = `
-            <div class="destiny-card-label">
-                STATUS PROFISSIONAL
-            </div>
+        title.textContent =
+            "CARREIRA";
 
-            <h2>
-                ${this.safe(
-                    player?.name ||
-                    "Novo lutador"
-                )}
-            </h2>
+        const subtitle =
+            document.createElement("p");
 
-            <div class="fighter-grid">
+        subtitle.textContent =
+            "Construa sua carreira dentro do MMA.";
 
-                <div>
-                    <span>OVR</span>
-
-                    <strong>
-                        ${this.getOverall(
-                            player
-                        )}
-                    </strong>
-                </div>
-
-                <div>
-                    <span>POTENCIAL</span>
-
-                    <strong>
-                        ${this.getPotential(
-                            player
-                        )}
-                    </strong>
-                </div>
-
-                <div>
-                    <span>RECORD</span>
-
-                    <strong>
-                        ${this.getRecord(
-                            player
-                        )}
-                    </strong>
-                </div>
-
-                <div>
-                    <span>RANKING</span>
-
-                    <strong>
-                        ${this.getRanking(
-                            player
-                        )}
-                    </strong>
-                </div>
-
-            </div>
-        `;
-
-        const attributes =
-            this.el(
-                "div",
-                "destiny-card"
-            );
-
-        attributes.innerHTML = `
-            <div class="destiny-card-label">
-                ATRIBUTOS
-            </div>
-
-            ${this.renderAttributeBars(
-                player
-            )}
-        `;
+        header.appendChild(title);
+        header.appendChild(subtitle);
 
         const actions =
-            this.el(
-                "div",
-                "destiny-action-grid"
-            );
+            document.createElement("div");
+
+        actions.className =
+            "destiny-database-menu";
 
         const careerActions = [
             ["TREINAMENTO", "training"],
@@ -1306,7 +1363,6 @@ class Renderer {
 
         careerActions.forEach(
             ([label, action]) => {
-
                 const button =
                     this.button(
                         label,
@@ -1319,1139 +1375,353 @@ class Renderer {
                 button.dataset.mmaLabel =
                     label;
 
-                actions.append(
+                actions.appendChild(
                     button
                 );
             }
         );
 
-        section.append(
-            overview,
-            attributes,
-            actions
-        );
-
-        this.appContainer.appendChild(
-            section
-        );
-    }
-        // =========================================================
-    // MUNDO
-    // =========================================================
-
-    renderWorld() {
-
-        this.clear();
-
-        const section =
-            this.createScreen(
-                "MUNDO",
-                "O universo do MMA continua vivendo mesmo quando você não luta."
-            );
-
-        const worldStats =
-            this.el(
-                "div",
-                "destiny-status-grid"
-            );
-
-        const world =
-            this.state.world || {};
-
-        worldStats.append(
-
-            this.statCard(
-                "LUTADORES",
-                this.count(
-                    world.fighters
-                ),
-                ""
-            ),
-
-            this.statCard(
-                "ORGANIZAÇÕES",
-                this.count(
-                    world.organizations
-                ),
-                ""
-            ),
-
-            this.statCard(
-                "EVENTOS",
-                this.count(
-                    world.events
-                ),
-                ""
-            ),
-
-            this.statCard(
-                "CAMPEÕES",
-                this.count(
-                    world.championships
-                ),
-                ""
-            )
-        );
-
-        const worldMenu =
-            this.el(
-                "div",
-                "destiny-card"
-            );
-
-        worldMenu.innerHTML = `
-            <div class="destiny-card-label">
-                DATABASE
-            </div>
-
-            <div class="destiny-database-menu">
-
-                <button
-                    type="button"
-                    data-mma-action="world-fighters"
-                    data-mma-label="LUTADORES"
-                >
-                    LUTADORES
-                </button>
-
-                <button
-                    type="button"
-                    data-mma-action="world-organizations"
-                    data-mma-label="ORGANIZAÇÕES"
-                >
-                    ORGANIZAÇÕES
-                </button>
-
-                <button
-                    type="button"
-                    data-mma-action="world-events"
-                    data-mma-label="EVENTOS"
-                >
-                    EVENTOS
-                </button>
-
-                <button
-                    type="button"
-                    data-mma-action="world-rankings"
-                    data-mma-label="RANKINGS"
-                >
-                    RANKINGS
-                </button>
-
-                <button
-                    type="button"
-                    data-mma-action="world-champions"
-                    data-mma-label="CAMPEÕES"
-                >
-                    CAMPEÕES
-                </button>
-
-                <button
-                    type="button"
-                    data-mma-action="world-history"
-                    data-mma-label="HISTÓRIA"
-                >
-                    HISTÓRIA
-                </button>
-
-                <button
-                    type="button"
-                    data-mma-action="world-news"
-                    data-mma-label="NOTÍCIAS"
-                >
-                    NOTÍCIAS
-                </button>
-
-                <button
-                    type="button"
-                    data-mma-action="world-h2h"
-                    data-mma-label="HEAD TO HEAD"
-                >
-                    HEAD TO HEAD
-                </button>
-
-            </div>
-        `;
-
-        section.append(
-            worldStats,
-            worldMenu
-        );
-
-        this.appContainer.appendChild(
-            section
-        );
-    }
-
-    // =========================================================
-    // VIDA
-    // =========================================================
-
-    renderLife() {
-
-        this.clear();
-
-        const section =
-            this.createScreen(
-                "VIDA",
-                "Porque a carreira é apenas uma parte da sua história."
-            );
-
-        const lifeMenu =
-            this.el(
-                "div",
-                "destiny-life-grid"
-            );
-
-        const items = [
-
-            [
-                "RELACIONAMENTOS",
-                "relationships"
-            ],
-
-            [
-                "FAMÍLIA",
-                "family"
-            ],
-
-            [
-                "FILHOS",
-                "children"
-            ],
-
-            [
-                "CASA",
-                "house"
-            ],
-
-            [
-                "VEÍCULOS",
-                "vehicles"
-            ],
-
-            [
-                "VIAGENS",
-                "travel"
-            ],
-
-            [
-                "EDUCAÇÃO",
-                "education"
-            ],
-
-            [
-                "FINANÇAS",
-                "finance"
-            ],
-
-            [
-                "ACADEMIA",
-                "academy"
-            ]
-        ];
-
-        const actionMap = {
-            relationships:
-                "life-relationships",
-
-            family:
-                "life-family",
-
-            children:
-                "life-children",
-
-            house:
-                "life-house",
-
-            vehicles:
-                "life-vehicles",
-
-            travel:
-                "life-travel",
-
-            education:
-                "life-education",
-
-            finance:
-                "life-finance",
-
-            academy:
-                "life-academy"
-        };
-
-        items.forEach(
-            ([title, icon]) => {
-
-                const card =
-                    this.el(
-                        "button",
-                        "destiny-life-card"
-                    );
-
-                card.type = "button";
-
-                card.dataset.mmaAction =
-                    actionMap[icon];
-
-                card.dataset.mmaLabel =
-                    title;
-
-                card.innerHTML = `
-                    <span class="life-icon">
-                        ${this.getLifeIcon(
-                            icon
-                        )}
-                    </span>
-
-                    <strong>
-                        ${title}
-                    </strong>
-
-                    <small>
-                        ABRIR
-                    </small>
-                `;
-
-                lifeMenu.appendChild(
-                    card
-                );
-            }
-        );
-
-        section.appendChild(
-            lifeMenu
-        );
-
-        this.appContainer.appendChild(
-            section
-        );
-    }
-
-    // =========================================================
-    // DINASTIA
-    // =========================================================
-
-    renderDynasty() {
-
-        this.clear();
-
-        const section =
-            this.createScreen(
-                "DINASTIA",
-                "Seu legado pode continuar muito depois da sua carreira."
-            );
-
-        const dynasty =
-            this.state.dynasty || {};
-
-        const legacyCard =
-            this.el(
-                "div",
-                "destiny-card destiny-legacy"
-            );
-
-        legacyCard.innerHTML = `
-            <div class="destiny-card-label">
-                LEGADO
-            </div>
-
-            <div class="legacy-score">
-                ${this.getLegacyScore(
-                    dynasty
-                )}
-            </div>
-
-            <p>
-                Pontuação histórica da sua família.
-            </p>
-        `;
-
-        const dynastyGrid =
-            this.el(
-                "div",
-                "destiny-status-grid"
-            );
-
-        dynastyGrid.append(
-
-            this.statCard(
-                "GERAÇÕES",
-                dynasty.generations || 1,
-                ""
-            ),
-
-            this.statCard(
-                "FILHOS",
-                this.count(
-                    dynasty.children ||
-                    this.state.children
-                ),
-                ""
-            ),
-
-            this.statCard(
-                "TÍTULOS",
-                dynasty.titles || 0,
-                ""
-            ),
-
-            this.statCard(
-                "HALL DA FAMA",
-                dynasty.hallOfFame
-                    ? "SIM"
-                    : "NÃO",
-                ""
-            )
-        );
-
-        const genealogy =
-            this.el(
-                "div",
-                "destiny-card"
-            );
-
-        genealogy.innerHTML = `
-            <div class="destiny-card-label">
-                LINHAGEM
-            </div>
-
-            <div class="genealogy-placeholder">
-
-                <div>
-                    VOCÊ
-                </div>
-
-                <span>↓</span>
-
-                <div>
-                    PRÓXIMA GERAÇÃO
-                </div>
-
-                <span>↓</span>
-
-                <div>
-                    LEGADO
-                </div>
-
-            </div>
-        `;
-
-        section.append(
-            legacyCard,
-            dynastyGrid,
-            genealogy
-        );
-
-        this.appContainer.appendChild(
-            section
-        );
-    }
-
-    // =========================================================
-    // COMPONENTES
-    // =========================================================
-
-    createScreen(
-        title,
-        subtitle
-    ) {
-        const section =
-            this.el(
-                "section",
-                "destiny-screen"
-            );
-
-        const header =
-            this.el(
-                "div",
-                "destiny-screen-header"
-            );
-
-        const titleElement =
-            this.el(
-                "h1",
-                "",
-                title
-            );
-
-        const subtitleElement =
-            this.el(
-                "p",
-                "",
-                subtitle
-            );
-
-        header.append(
-            titleElement,
-            subtitleElement
-        );
-
-        section.appendChild(
-            header
-        );
-
-        return section;
-    }
-
-    statCard(
-        label,
-        value,
-        suffix = ""
-    ) {
-        const card =
-            this.el(
-                "div",
-                "destiny-stat-card"
-            );
-
-        card.innerHTML = `
-            <span>
-                ${this.safe(label)}
-            </span>
-
-            <strong>
-                ${this.safe(value)}${suffix}
-            </strong>
-        `;
-
-        return card;
-    }
-
-    quickButton(
-        label,
-        route
-    ) {
-        const button =
+        const backButton =
             this.button(
-                label,
+                "← INÍCIO",
                 "destiny-secondary-button"
             );
 
-        button.addEventListener(
-            "click",
-            () => {
+        backButton.dataset.route =
+            ROUTES.HOME;
 
-                if (
-                    window.MMA_DESTINY
-                        ?.router
-                ) {
+        wrapper.appendChild(header);
+        wrapper.appendChild(actions);
+        wrapper.appendChild(backButton);
 
-                    window.MMA_DESTINY
-                        .router
-                        .navigate(
-                            route
-                        );
-                }
-            }
-        );
+        container.appendChild(wrapper);
 
-        return button;
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
     }
 
-    renderAttributeBars(
-        player
-    ) {
-        const attributes =
-            player?.attributes || {};
+    renderWorld() {
+        const container =
+            this.ensureContainer();
 
-        const list = [
+        container.innerHTML = "";
 
+        const wrapper =
+            document.createElement("div");
+
+        wrapper.className =
+            "destiny-world";
+
+        const header =
+            document.createElement("header");
+
+        header.className =
+            "destiny-section-header";
+
+        const title =
+            document.createElement("h1");
+
+        title.textContent =
+            "MUNDO";
+
+        const subtitle =
+            document.createElement("p");
+
+        subtitle.textContent =
+            "Explore o universo do MMA DESTINY.";
+
+        header.appendChild(title);
+        header.appendChild(subtitle);
+
+        const database =
+            document.createElement("div");
+
+        database.className =
+            "destiny-database-menu";
+
+        const worldActions = [
             [
-                "STRIKING",
-                "striking"
+                "LUTADORES",
+                "world-fighters"
             ],
-
             [
-                "WRESTLING",
-                "wrestling"
+                "ORGANIZAÇÕES",
+                "world-organizations"
             ],
-
             [
-                "GRAPPLING",
-                "grappling"
+                "EVENTOS",
+                "world-events"
             ],
-
             [
-                "BJJ",
-                "bjj"
+                "RANKINGS MUNDIAIS",
+                "world-rankings"
             ],
-
             [
-                "DEFESA DE QUEDAS",
-                "takedownDefense"
+                "CAMPEÕES",
+                "world-champions"
             ],
-
             [
-                "DEFESA DE STRIKING",
-                "strikingDefense"
+                "HISTÓRIA",
+                "world-history"
             ],
-
             [
-                "CARDIO",
-                "cardio"
+                "NOTÍCIAS",
+                "world-news"
             ],
-
             [
-                "FORÇA",
-                "strength"
-            ],
-
-            [
-                "VELOCIDADE",
-                "speed"
-            ],
-
-            [
-                "DURABILIDADE",
-                "durability"
-            ],
-
-            [
-                "FIGHT IQ",
-                "fightIQ"
-            ],
-
-            [
-                "DISCIPLINA",
-                "discipline"
-            ],
-
-            [
-                "CONFIANÇA",
-                "confidence"
-            ],
-
-            [
-                "MENTAL",
-                "mental"
+                "HEAD TO HEAD",
+                "world-h2h"
             ]
         ];
 
-        return list.map(
-            ([label, key]) => {
+        worldActions.forEach(
+            ([label, action]) => {
+                const button =
+                    this.button(
+                        label,
+                        "destiny-secondary-button"
+                    );
 
-                const value =
-                    Number(
-                        attributes[key]
-                    ) || 0;
+                button.dataset.mmaAction =
+                    action;
 
-                return `
-                    <div class="attribute-row">
+                button.dataset.mmaLabel =
+                    label;
 
-                        <div class="attribute-header">
-
-                            <span>
-                                ${label}
-                            </span>
-
-                            <strong>
-                                ${value}
-                            </strong>
-
-                        </div>
-
-                        <div class="attribute-track">
-
-                            <div
-                                class="attribute-fill"
-                                style="
-                                    width:${Math.min(
-                                        100,
-                                        Math.max(
-                                            0,
-                                            value
-                                        )
-                                    )}%
-                                "
-                            ></div>
-
-                        </div>
-
-                    </div>
-                `;
-            }
-        ).join("");
-    }
-
-    // =========================================================
-    // DADOS
-    // =========================================================
-
-    getPlayer() {
-        return (
-            this.state?.player ||
-            this.state?.currentPlayer ||
-            null
-        );
-    }
-
-    getGameDate() {
-        const calendar =
-            this.engine?.calendar ||
-            this.state?.calendar;
-
-        if (
-            calendar &&
-            typeof calendar.getCurrentDate ===
-                "function"
-        ) {
-            return calendar.getCurrentDate();
-        }
-
-        return (
-            calendar?.currentDate ||
-            this.state?.date ||
-            "2026-01-01"
-        );
-    }
-
-    formatDate(date) {
-        if (!date) {
-            return "01/01/2026";
-        }
-
-        const parsed =
-            new Date(date);
-
-        if (
-            Number.isNaN(
-                parsed.getTime()
-            )
-        ) {
-            return String(date);
-        }
-
-        return parsed.toLocaleDateString(
-            "pt-BR"
-        );
-    }
-
-    getPlayerAge(player) {
-        if (!player) {
-            return 15;
-        }
-
-        if (
-            typeof player.age ===
-            "number"
-        ) {
-            return player.age;
-        }
-
-        if (
-            player.birthDate &&
-            this.getGameDate()
-        ) {
-            const birth =
-                new Date(
-                    player.birthDate
+                database.appendChild(
+                    button
                 );
-
-            const current =
-                new Date(
-                    this.getGameDate()
-                );
-
-            let age =
-                current.getFullYear() -
-                birth.getFullYear();
-
-            const month =
-                current.getMonth() -
-                birth.getMonth();
-
-            if (
-                month < 0 ||
-                (
-                    month === 0 &&
-                    current.getDate() <
-                    birth.getDate()
-                )
-            ) {
-                age--;
             }
+        );
 
-            return Math.max(
-                0,
-                age
-            );
-        }
-
-        return 15;
-    }
-
-    getOverall(player) {
-        if (!player) {
-            return 0;
-        }
-
-        if (
-            typeof player.overall ===
-            "number"
-        ) {
-            return Math.round(
-                player.overall
-            );
-        }
-
-        if (
-            typeof player.ovr ===
-            "number"
-        ) {
-            return Math.round(
-                player.ovr
-            );
-        }
-
-        const attributes =
-            player.attributes || {};
-
-        const values =
-            Object.values(
-                attributes
-            ).filter(
-                value =>
-                    typeof value ===
-                    "number"
+        const backButton =
+            this.button(
+                "← INÍCIO",
+                "destiny-secondary-button"
             );
 
-        if (!values.length) {
-            return 0;
-        }
+        backButton.dataset.route =
+            ROUTES.HOME;
 
-        return Math.round(
-            values.reduce(
-                (
-                    sum,
-                    value
-                ) =>
-                    sum + value,
-                0
-            ) /
-            values.length
-        );
+        wrapper.appendChild(header);
+        wrapper.appendChild(database);
+        wrapper.appendChild(backButton);
+
+        container.appendChild(wrapper);
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
     }
 
-    getPotential(player) {
-        if (!player) {
-            return 0;
-        }
+    renderLife() {
+        const container =
+            this.ensureContainer();
 
-        return Math.round(
-            player.potential ??
-            player.ceiling ??
-            this.getOverall(
-                player
-            )
-        );
-    }
+        container.innerHTML = "";
 
-    getRecord(player) {
-        if (!player) {
-            return "0-0-0";
-        }
+        const wrapper =
+            document.createElement("div");
 
-        const record =
-            player.record || {};
+        wrapper.className =
+            "destiny-life";
 
-        const wins =
-            record.wins ??
-            player.wins ??
-            0;
+        const header =
+            document.createElement("header");
 
-        const losses =
-            record.losses ??
-            player.losses ??
-            0;
+        header.className =
+            "destiny-section-header";
 
-        const draws =
-            record.draws ??
-            player.draws ??
-            0;
+        const title =
+            document.createElement("h1");
 
-        return `${wins}-${losses}-${draws}`;
-    }
+        title.textContent =
+            "VIDA";
 
-    getRanking(player) {
-        if (!player) {
-            return "—";
-        }
+        const subtitle =
+            document.createElement("p");
 
-        return (
-            player.ranking ??
-            player.rank ??
-            "NR"
-        );
-    }
+        subtitle.textContent =
+            "Sua vida também faz parte da carreira.";
 
-    getWeightClass(player) {
-        if (!player) {
-            return "—";
-        }
+        header.appendChild(title);
+        header.appendChild(subtitle);
 
-        return (
-            player.weightClassName ||
-            player.weightClass ||
-            "—"
-        );
-    }
+        const grid =
+            document.createElement("div");
 
-    getHealth(player) {
-        if (!player) {
-            return 100;
-        }
+        grid.className =
+            "destiny-life-grid";
 
-        return Math.round(
-            player.health?.current ??
-            player.health ??
-            100
-        );
-    }
+        const lifeActions = [
+            [
+                "RELACIONAMENTOS",
+                "life-relationships"
+            ],
+            [
+                "FAMÍLIA",
+                "life-family"
+            ],
+            [
+                "FILHOS",
+                "life-children"
+            ],
+            [
+                "CASA",
+                "life-house"
+            ],
+            [
+                "VEÍCULOS",
+                "life-vehicles"
+            ],
+            [
+                "VIAGENS",
+                "life-travel"
+            ],
+            [
+                "EDUCAÇÃO",
+                "life-education"
+            ],
+            [
+                "FINANÇAS",
+                "life-finance"
+            ],
+            [
+                "ACADEMIA",
+                "life-academy"
+            ]
+        ];
 
-    getFatigue(player) {
-        if (!player) {
-            return 0;
-        }
+        lifeActions.forEach(
+            ([label, action]) => {
+                const button =
+                    this.button(
+                        label,
+                        "destiny-life-card"
+                    );
 
-        return Math.round(
-            player.fatigue ??
-            player.health?.fatigue ??
-            0
-        );
-    }
+                button.dataset.mmaAction =
+                    action;
 
-    getHype(player) {
-        if (!player) {
-            return 0;
-        }
+                button.dataset.mmaLabel =
+                    label;
 
-        return Math.round(
-            player.hype ??
-            player.media?.hype ??
-            0
-        );
-    }
-
-    getMoney() {
-        const finance =
-            this.state?.finance;
-
-        if (!finance) {
-            return "R$ 0";
-        }
-
-        const amount =
-            finance.accounts?.BRL ??
-            finance.money?.BRL ??
-            finance.cash?.BRL ??
-            finance.cash ??
-            0;
-
-        if (
-            typeof amount ===
-            "object"
-        ) {
-            return "R$ 0";
-        }
-
-        return `R$ ${Number(
-            amount
-        ).toLocaleString(
-            "pt-BR"
-        )}`;
-    }
-
-    getNextEvent() {
-        const events =
-            this.state?.world
-                ?.events;
-
-        if (
-            Array.isArray(events) &&
-            events.length
-        ) {
-            const next =
-                events.find(
-                    event =>
-                        !event.completed &&
-                        !event.finished
+                grid.appendChild(
+                    button
                 );
-
-            if (next?.name) {
-                return next.name;
             }
-        }
-
-        return "Nenhum evento marcado";
-    }
-        getNextEventDescription() {
-        const player =
-            this.getPlayer();
-
-        if (!player) {
-            return "Crie seu lutador para iniciar sua carreira.";
-        }
-
-        if (
-            player.nextFight
-        ) {
-            return "Sua próxima luta está marcada.";
-        }
-
-        return "Treine, desenvolva seus atributos e construa sua reputação.";
-    }
-
-    getLegacyScore(dynasty) {
-        if (!dynasty) {
-            return 0;
-        }
-
-        return Math.round(
-            dynasty.legacyScore ??
-            dynasty.score ??
-            0
         );
-    }
 
-    count(value) {
-        if (
-            Array.isArray(value)
-        ) {
-            return value.length;
-        }
-
-        if (
-            value &&
-            typeof value ===
-                "object"
-        ) {
-            return Object.keys(
-                value
-            ).length;
-        }
-
-        if (
-            typeof value ===
-            "number"
-        ) {
-            return value;
-        }
-
-        return 0;
-    }
-
-    getInitials(name) {
-        if (!name) {
-            return "MD";
-        }
-
-        return name
-            .split(" ")
-            .filter(Boolean)
-            .slice(0, 2)
-            .map(
-                word =>
-                    word[0]
-            )
-            .join("")
-            .toUpperCase();
-    }
-
-    getLifeIcon(type) {
-        const icons = {
-
-            relationships: "♡",
-
-            family: "♧",
-
-            children: "♢",
-
-            house: "⌂",
-
-            vehicles: "▣",
-
-            travel: "✈",
-
-            education: "▤",
-
-            finance: "$",
-
-            academy: "♜"
-        };
-
-        return (
-            icons[type] ||
-            "◇"
-        );
-    }
-
-    safe(value) {
-        return String(
-            value ?? ""
-        )
-            .replaceAll(
-                "&",
-                "&amp;"
-            )
-            .replaceAll(
-                "<",
-                "&lt;"
-            )
-            .replaceAll(
-                ">",
-                "&gt;"
-            )
-            .replaceAll(
-                '"',
-                "&quot;"
-            )
-            .replaceAll(
-                "'",
-                "&#039;"
+        const backButton =
+            this.button(
+                "← INÍCIO",
+                "destiny-secondary-button"
             );
-    }
 
-    // =========================================================
-    // ESTILOS
-    // =========================================================
+        backButton.dataset.route =
+            ROUTES.HOME;
+
+        wrapper.appendChild(header);
+        wrapper.appendChild(grid);
+        wrapper.appendChild(backButton);
+
+        container.appendChild(wrapper);
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }
+        renderDynasty() {
+        const container =
+            this.ensureContainer();
+
+        container.innerHTML = "";
+
+        const wrapper =
+            document.createElement("div");
+
+        wrapper.className =
+            "destiny-dynasty";
+
+        const header =
+            document.createElement("header");
+
+        header.className =
+            "destiny-section-header";
+
+        const title =
+            document.createElement("h1");
+
+        title.textContent =
+            "DINASTIA";
+
+        const subtitle =
+            document.createElement("p");
+
+        subtitle.textContent =
+            "Seu legado continua além da sua própria carreira.";
+
+        header.appendChild(title);
+        header.appendChild(subtitle);
+
+        const content =
+            document.createElement("section");
+
+        content.className =
+            "destiny-dynasty-content";
+
+        content.innerHTML = `
+            <div class="destiny-empty-state">
+                <h2>SEU LEGADO</h2>
+                <p>
+                    Construa sua história, forme sua família
+                    e deixe uma geração capaz de continuar
+                    sua trajetória.
+                </p>
+            </div>
+        `;
+
+        const backButton =
+            this.button(
+                "← INÍCIO",
+                "destiny-secondary-button"
+            );
+
+        backButton.dataset.route =
+            ROUTES.HOME;
+
+        wrapper.appendChild(header);
+        wrapper.appendChild(content);
+        wrapper.appendChild(backButton);
+
+        container.appendChild(wrapper);
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }
 
     injectRuntimeStyles() {
-
         if (
             document.getElementById(
-                "mma-destiny-renderer-styles"
+                "mma-destiny-runtime-styles"
             )
         ) {
             return;
         }
 
         const style =
-            document.createElement(
-                "style"
-            );
+            document.createElement("style");
 
         style.id =
-            "mma-destiny-renderer-styles";
+            "mma-destiny-runtime-styles";
 
         style.textContent = `
-
-            /* ================================================
-               BASE
-            ================================================ */
-
-            html,
-            body {
-                margin: 0;
-                padding: 0;
-                width: 100%;
-                min-height: 100%;
-            }
-
-            body {
-                overflow-x: hidden;
-            }
-
             #mma-destiny-app {
                 width: 100%;
                 min-height: 100vh;
@@ -2462,819 +1732,159 @@ class Renderer {
                 min-height: 100vh;
             }
 
-            /* ================================================
-               SCREEN
-            ================================================ */
-
-            .destiny-screen {
-                box-sizing: border-box;
-                width: 100%;
-                max-width: 1100px;
-                margin: 0 auto;
-                padding: 24px 18px 130px;
-            }
-
-            /* ================================================
-               HEADER
-            ================================================ */
-
-            .destiny-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                gap: 15px;
-                margin-bottom: 30px;
-            }
-
-            .destiny-brand {
-                display: flex;
-                gap: 6px;
-                font-family: Rajdhani, sans-serif;
-                font-size: 25px;
-                font-weight: 800;
-                letter-spacing: 2px;
-            }
-
-            .destiny-brand-accent {
-                opacity: .75;
-            }
-
-            .destiny-date {
-                font-size: 12px;
-                opacity: .65;
-                white-space: nowrap;
-            }
-
-            /* ================================================
-               HERO
-            ================================================ */
-
-            .destiny-hero {
-                margin-bottom: 22px;
-            }
-
-            .destiny-hero h1,
-            .destiny-screen-header h1 {
-                margin: 0;
-                font-family: Rajdhani, sans-serif;
-                font-size: clamp(
-                    32px,
-                    8vw,
-                    58px
-                );
-                font-weight: 800;
-                letter-spacing: 1px;
-                line-height: .95;
-            }
-
-            .destiny-hero p,
-            .destiny-screen-header p {
-                margin-top: 10px;
-                margin-bottom: 0;
-                opacity: .65;
-                line-height: 1.45;
-            }
-
-            /* ================================================
-               CARDS
-            ================================================ */
-
-            .destiny-card {
-                box-sizing: border-box;
-
-                border: 1px solid rgba(
-                    255,
-                    255,
-                    255,
-                    .09
-                );
-
-                background: rgba(
-                    255,
-                    255,
-                    255,
-                    .025
-                );
-
-                border-radius: 14px;
-                padding: 20px;
-                margin-bottom: 14px;
-            }
-
-            .destiny-card-label {
-                font-size: 10px;
-                font-weight: 800;
-                letter-spacing: 2px;
-                opacity: .5;
-                margin-bottom: 14px;
-            }
-
-            /* ================================================
-               FIGHTER
-            ================================================ */
-
-            .fighter-main {
-                display: flex;
-                align-items: center;
-                gap: 14px;
-            }
-
-            .fighter-avatar {
-                width: 58px;
-                height: 58px;
-                flex: 0 0 58px;
-
-                display: grid;
-                place-items: center;
-
-                border: 1px solid rgba(
-                    255,
-                    255,
-                    255,
-                    .2
-                );
-
-                border-radius: 50%;
-
-                font-family:
-                    Rajdhani,
-                    sans-serif;
-
-                font-size: 22px;
-                font-weight: 800;
-            }
-
-            .fighter-info h2 {
-                margin: 0;
-
-                font-family:
-                    Rajdhani,
-                    sans-serif;
-
-                font-size: 25px;
-            }
-
-            .fighter-info p {
-                margin: 3px 0 0;
-                opacity: .55;
-            }
-
-            .fighter-grid {
-                display: grid;
-
-                grid-template-columns:
-                    repeat(4, 1fr);
-
-                gap: 10px;
-                margin-top: 20px;
-            }
-
-            .fighter-grid div,
-            .destiny-stat-card {
-                padding: 13px;
-                border-radius: 10px;
-
-                background: rgba(
-                    255,
-                    255,
-                    255,
-                    .035
-                );
-            }
-
-            .fighter-grid span,
-            .destiny-stat-card span {
-                display: block;
-
-                font-size: 9px;
-                letter-spacing: 1.5px;
-                opacity: .5;
-                margin-bottom: 5px;
-            }
-
-            .fighter-grid strong,
-            .destiny-stat-card strong {
-                font-family:
-                    Rajdhani,
-                    sans-serif;
-
-                font-size: 20px;
-            }
-
-            /* ================================================
-               STATUS
-            ================================================ */
-
-            .destiny-status-grid {
-                display: grid;
-
-                grid-template-columns:
-                    repeat(4, 1fr);
-
-                gap: 10px;
-                margin-bottom: 14px;
-            }
-
-            .destiny-stat-card {
-                text-align: center;
-            }
-
-            /* ================================================
-               BUTTONS
-            ================================================ */
-
-            .destiny-primary-button {
-                width: 100%;
-                min-height: 58px;
-                margin: 8px 0 18px;
-
-                border: 0;
-                border-radius: 10px;
-
-                background: #fff;
-                color: #000;
-
-                font-family:
-                    Rajdhani,
-                    sans-serif;
-
-                font-size: 18px;
-                font-weight: 800;
-                letter-spacing: 1px;
-
-                cursor: pointer;
-
-                position: relative;
-                z-index: 2;
-
-                pointer-events: auto;
-            }
-
-            .destiny-primary-button:disabled {
-                opacity: .5;
-                cursor: wait;
-            }
-
-            .destiny-secondary-button {
-                min-height: 48px;
-
-                border: 1px solid rgba(
-                    255,
-                    255,
-                    255,
-                    .12
-                );
-
-                border-radius: 9px;
-
-                background: rgba(
-                    255,
-                    255,
-                    255,
-                    .025
-                );
-
-                color: inherit;
-
-                font-family:
-                    Rajdhani,
-                    sans-serif;
-
-                font-weight: 700;
-                letter-spacing: 1px;
-
-                cursor: pointer;
-
-                position: relative;
-                z-index: 2;
-
-                pointer-events: auto;
-            }
-
-            .destiny-quick-actions,
-            .destiny-action-grid {
-                display: grid;
-
-                grid-template-columns:
-                    repeat(4, 1fr);
-
-                gap: 10px;
-            }
-
-            /* ================================================
-               ATTRIBUTOS
-            ================================================ */
-
-            .attribute-row {
-                margin-bottom: 13px;
-            }
-
-            .attribute-header {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 5px;
-                font-size: 11px;
-            }
-
-            .attribute-header strong {
-                font-family:
-                    Rajdhani,
-                    sans-serif;
-            }
-
-            .attribute-track {
-                height: 5px;
-
-                border-radius: 10px;
-
-                background: rgba(
-                    255,
-                    255,
-                    255,
-                    .08
-                );
-
-                overflow: hidden;
-            }
-
-            .attribute-fill {
-                height: 100%;
-
-                background: currentColor;
-
-                border-radius: inherit;
-            }
-
-            /* ================================================
-               DATABASE
-            ================================================ */
-
-            .destiny-database-menu {
-                display: grid;
-
-                grid-template-columns:
-                    repeat(2, 1fr);
-
-                gap: 8px;
-            }
-
-            .destiny-database-menu button {
-                min-height: 50px;
-
-                border: 1px solid rgba(
-                    255,
-                    255,
-                    255,
-                    .1
-                );
-
-                background: rgba(
-                    255,
-                    255,
-                    255,
-                    .025
-                );
-
-                color: inherit;
-
-                border-radius: 9px;
-
-                font-family:
-                    Rajdhani,
-                    sans-serif;
-
-                font-weight: 700;
-
-                cursor: pointer;
-
-                position: relative;
-                z-index: 2;
-
-                pointer-events: auto;
-            }
-
-            /* ================================================
-               VIDA
-            ================================================ */
-
-            .destiny-life-grid {
-                display: grid;
-
-                grid-template-columns:
-                    repeat(3, 1fr);
-
-                gap: 10px;
-            }
-
+            /*
+             * ==========================================
+             * BOTÕES
+             * ==========================================
+             */
+
+            .destiny-primary-button,
+            .destiny-secondary-button,
+            .destiny-database-menu button,
             .destiny-life-card {
-                min-height: 110px;
-
-                padding: 15px;
-
-                text-align: left;
-
-                border: 1px solid rgba(
-                    255,
-                    255,
-                    255,
-                    .09
-                );
-
-                border-radius: 12px;
-
-                background: rgba(
-                    255,
-                    255,
-                    255,
-                    .025
-                );
-
-                color: inherit;
-
-                cursor: pointer;
-
                 position: relative;
                 z-index: 2;
-
                 pointer-events: auto;
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+                cursor: pointer;
             }
 
-            .destiny-life-card
-            .life-icon {
-                display: block;
-                font-size: 24px;
-                margin-bottom: 10px;
+            .destiny-primary-button:disabled,
+            .destiny-secondary-button:disabled {
+                cursor: default;
+                opacity: 0.65;
             }
 
-            .destiny-life-card strong {
-                display: block;
+            /*
+             * ==========================================
+             * TELAS INTERNAS
+             * ==========================================
+             */
 
-                font-family:
-                    Rajdhani,
-                    sans-serif;
+            .destiny-internal-screen {
+                width: 100%;
+                min-height: 100vh;
+                box-sizing: border-box;
+                padding: 24px;
             }
 
-            .destiny-life-card small {
-                display: block;
-
-                margin-top: 5px;
-
-                opacity: .4;
-
-                font-size: 9px;
-            }
-
-            /* ================================================
-               DINASTIA
-            ================================================ */
-
-            .legacy-score {
-                font-family:
-                    Rajdhani,
-                    sans-serif;
-
-                font-size: 70px;
-                font-weight: 800;
-            }
-
-            .genealogy-placeholder {
+            .destiny-internal-header {
                 display: flex;
-
                 align-items: center;
-                justify-content: center;
+                gap: 16px;
+                margin-bottom: 24px;
+            }
 
-                gap: 15px;
+            .destiny-internal-header h1 {
+                margin: 0;
+            }
 
-                flex-wrap: wrap;
+            .destiny-internal-content {
+                width: 100%;
+            }
 
+            .destiny-empty-state {
+                padding: 28px;
+                border-radius: 16px;
                 text-align: center;
-
-                font-family:
-                    Rajdhani,
-                    sans-serif;
-
-                font-weight: 700;
             }
 
-            /* ================================================
-               CRIAÇÃO
-            ================================================ */
-
-            .creation-features {
-                display: grid;
-
-                grid-template-columns:
-                    repeat(3, 1fr);
-
-                gap: 8px;
-
-                margin-top: 20px;
+            .destiny-empty-state h2 {
+                margin-top: 0;
             }
 
-            .creation-features div {
-                padding: 14px;
-
-                text-align: center;
-
-                border-radius: 10px;
-
-                background: rgba(
-                    255,
-                    255,
-                    255,
-                    .035
-                );
-            }
-
-            .creation-features strong {
-                display: block;
-
-                font-family:
-                    Rajdhani,
-                    sans-serif;
-
-                font-size: 25px;
-            }
-
-            .creation-features span {
-                display: block;
-
-                margin-top: 4px;
-
-                font-size: 8px;
-
-                letter-spacing: 1px;
-
-                opacity: .5;
-            }
+            /*
+             * ==========================================
+             * CRIAÇÃO DO LUTADOR
+             * ==========================================
+             */
 
             .fighter-creation-overlay {
                 position: fixed;
                 inset: 0;
-
                 z-index: 9999;
-
                 display: flex;
-
                 align-items: center;
                 justify-content: center;
-
                 padding: 20px;
-
-                background: rgba(
-                    0,
-                    0,
-                    0,
-                    .82
-                );
-
-                backdrop-filter:
-                    blur(8px);
+                box-sizing: border-box;
+                overflow-y: auto;
+                background: rgba(0, 0, 0, 0.82);
             }
 
             .fighter-creation-modal {
-                box-sizing: border-box;
-
-                width: 100%;
-                max-width: 520px;
-                max-height: 90vh;
-
+                width: min(100%, 560px);
+                max-height: calc(100vh - 40px);
                 overflow-y: auto;
-
-                padding: 24px;
-
-                border: 1px solid rgba(
-                    255,
-                    255,
-                    255,
-                    .12
-                );
-
-                border-radius: 16px;
-
-                background: #0b0b0b;
-
-                box-shadow:
-                    0 20px 80px
-                    rgba(
-                        0,
-                        0,
-                        0,
-                        .7
-                    );
-            }
-
-            .fighter-creation-modal h2 {
-                margin: 0;
-
-                font-family:
-                    Rajdhani,
-                    sans-serif;
-
-                font-size: 32px;
-            }
-
-            .creation-description {
-                margin-top: 6px;
-                opacity: .6;
-            }
-
-            .creation-form {
-                display: grid;
-
-                gap: 14px;
-
-                margin-top: 20px;
-            }
-
-            .creation-form label {
-                display: grid;
-
-                gap: 7px;
-
-                font-size: 10px;
-
-                font-weight: 800;
-
-                letter-spacing: 1.5px;
-
-                opacity: .8;
-            }
-
-            .creation-form input,
-            .creation-form select {
                 box-sizing: border-box;
+                padding: 24px;
+                border-radius: 18px;
+            }
 
+            .fighter-creation-form {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .fighter-creation-form label {
+                display: flex;
+                flex-direction: column;
+                gap: 7px;
+            }
+
+            .fighter-creation-form input,
+            .fighter-creation-form select {
                 width: 100%;
-                min-height: 48px;
-
-                padding: 10px 12px;
-
-                border: 1px solid rgba(
-                    255,
-                    255,
-                    255,
-                    .12
-                );
-
-                border-radius: 8px;
-
-                background: rgba(
-                    255,
-                    255,
-                    255,
-                    .04
-                );
-
-                color: #fff;
-
-                font-family:
-                    Inter,
-                    sans-serif;
-
-                font-size: 14px;
-
-                outline: none;
+                box-sizing: border-box;
+                min-height: 44px;
             }
 
-            .creation-form input:focus,
-            .creation-form select:focus {
-                border-color: rgba(
-                    255,
-                    255,
-                    255,
-                    .35
-                );
+            .fighter-creation-actions {
+                display: flex;
+                gap: 12px;
+                margin-top: 8px;
             }
 
-            .creation-form select option {
-                background: #111;
-                color: #fff;
+            .fighter-creation-actions button {
+                flex: 1;
             }
 
-            .creation-actions {
-                display: grid;
+            /*
+             * ==========================================
+             * MOBILE
+             * ==========================================
+             */
 
-                grid-template-columns:
-                    1fr 1fr;
-
-                gap: 10px;
-
-                margin-top: 20px;
-            }
-
-            .creation-actions
-            .destiny-primary-button {
-                margin: 0;
-            }
-
-            /* ================================================
-               MOBILE
-            ================================================ */
-
-            @media (max-width: 700px) {
-
-                .destiny-screen {
-                    padding:
-                        18px
-                        14px
-                        130px;
-                }
-
-                .fighter-grid,
-                .destiny-status-grid {
-                    grid-template-columns:
-                        repeat(2, 1fr);
-                }
-
-                .destiny-quick-actions,
-                .destiny-action-grid {
-                    grid-template-columns:
-                        repeat(2, 1fr);
-                }
-
-                .destiny-life-grid {
-                    grid-template-columns:
-                        repeat(2, 1fr);
-                }
-
-                .destiny-header {
-                    margin-bottom: 24px;
-                }
-            }
-
-            @media (max-width: 420px) {
-
-                .destiny-screen {
-                    padding:
-                        16px
-                        12px
-                        130px;
-                }
-
-                .destiny-brand {
-                    font-size: 21px;
-                }
-
-                .destiny-date {
-                    font-size: 10px;
-                }
-
-                .destiny-hero h1,
-                .destiny-screen-header h1 {
-                    font-size: 34px;
-                }
-
-                .destiny-card {
+            @media (max-width: 600px) {
+                .destiny-internal-screen {
                     padding: 16px;
                 }
 
-                .fighter-grid {
-                    gap: 7px;
-                }
-
-                .destiny-life-card {
-                    min-height: 100px;
-                }
-
-                .creation-actions {
-                    grid-template-columns:
-                        1fr;
+                .destiny-internal-header {
+                    align-items: flex-start;
+                    flex-direction: column;
                 }
 
                 .fighter-creation-overlay {
+                    align-items: flex-start;
                     padding: 12px;
                 }
 
                 .fighter-creation-modal {
+                    max-height: calc(100vh - 24px);
                     padding: 18px;
+                }
+
+                .fighter-creation-actions {
+                    flex-direction: column;
                 }
             }
         `;
 
-        document.head.appendChild(
-            style
-        );
-    }
-
-    // =========================================================
-    // REFRESH
-    // =========================================================
-
-    refresh() {
-
-        const route =
-            window.MMA_DESTINY
-                ?.router
-                ?.getCurrentRoute() ||
-            ROUTES.HOME;
-
-        this.renderRoute(
-            route
-        );
+        document.head.appendChild(style);
     }
 }
 
-export {
-    Renderer
-};
+export { Renderer };
