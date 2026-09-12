@@ -25,65 +25,38 @@ class Renderer {
 
         this._interactionSystemBound = true;
 
-        document.addEventListener("click", (event) => {
-            const button = event.target.closest("button");
+        document.addEventListener(
+            "click",
+            (event) => {
 
-            if (!button || button.disabled) {
-                return;
-            }
+                const button =
+                    event.target.closest("button");
 
-            const careerActions = {
-                "TREINAMENTO": "training",
-                "CAMP": "camp",
-                "LUTAS": "fights",
-                "CONTRATOS": "contracts",
-                "RANKINGS": "rankings",
-                "HISTÓRICO": "history"
-            };
+                if (!button || button.disabled) {
+                    return;
+                }
 
-            const worldActions = {
-                "LUTADORES": "world-fighters",
-                "ORGANIZAÇÕES": "world-organizations",
-                "EVENTOS": "world-events",
-                "RANKINGS": "world-rankings",
-                "CAMPEÕES": "world-champions",
-                "HISTÓRIA": "world-history",
-                "NOTÍCIAS": "world-news",
-                "HEAD TO HEAD": "world-h2h"
-            };
+                const action =
+                    button.dataset.mmaAction;
 
-            const lifeActions = {
-                "RELACIONAMENTOS": "life-relationships",
-                "FAMÍLIA": "life-family",
-                "FILHOS": "life-children",
-                "CASA": "life-house",
-                "VEÍCULOS": "life-vehicles",
-                "VIAGENS": "life-travel",
-                "EDUCAÇÃO": "life-education",
-                "FINANÇAS": "life-finance",
-                "ACADEMIA": "life-academy"
-            };
+                if (!action) {
+                    return;
+                }
 
-            const label =
-                button.textContent
-                    .trim()
-                    .replace(/\s+/g, " ");
+                const label =
+                    button.dataset.mmaLabel ||
+                    button.textContent
+                        .trim()
+                        .replace(/\s+/g, " ");
 
-            const action =
-                careerActions[label] ||
-                worldActions[label] ||
-                lifeActions[label];
-
-            if (!action) {
-                return;
-            }
-
-            this.handleInternalAction(
-                action,
-                label,
-                button
-            );
-        });
+                this.handleInternalAction(
+                    action,
+                    label,
+                    button
+                );
+            },
+            true
+        );
     }
 
     handleInternalAction(
@@ -1322,21 +1295,32 @@ class Renderer {
                 "destiny-action-grid"
             );
 
-        [
-            "TREINAMENTO",
-            "CAMP",
-            "LUTAS",
-            "CONTRATOS",
-            "RANKINGS",
-            "HISTÓRICO"
-        ].forEach(
-            label => {
+        const careerActions = [
+            ["TREINAMENTO", "training"],
+            ["CAMP", "camp"],
+            ["LUTAS", "fights"],
+            ["CONTRATOS", "contracts"],
+            ["RANKINGS", "rankings"],
+            ["HISTÓRICO", "history"]
+        ];
 
-                actions.append(
+        careerActions.forEach(
+            ([label, action]) => {
+
+                const button =
                     this.button(
                         label,
                         "destiny-secondary-button"
-                    )
+                    );
+
+                button.dataset.mmaAction =
+                    action;
+
+                button.dataset.mmaLabel =
+                    label;
+
+                actions.append(
+                    button
                 );
             }
         );
@@ -1351,8 +1335,7 @@ class Renderer {
             section
         );
     }
-
-    // =========================================================
+        // =========================================================
     // MUNDO
     // =========================================================
 
@@ -1423,35 +1406,67 @@ class Renderer {
 
             <div class="destiny-database-menu">
 
-                <button type="button">
+                <button
+                    type="button"
+                    data-mma-action="world-fighters"
+                    data-mma-label="LUTADORES"
+                >
                     LUTADORES
                 </button>
 
-                <button type="button">
+                <button
+                    type="button"
+                    data-mma-action="world-organizations"
+                    data-mma-label="ORGANIZAÇÕES"
+                >
                     ORGANIZAÇÕES
                 </button>
 
-                <button type="button">
+                <button
+                    type="button"
+                    data-mma-action="world-events"
+                    data-mma-label="EVENTOS"
+                >
                     EVENTOS
                 </button>
 
-                <button type="button">
+                <button
+                    type="button"
+                    data-mma-action="world-rankings"
+                    data-mma-label="RANKINGS"
+                >
                     RANKINGS
                 </button>
 
-                <button type="button">
+                <button
+                    type="button"
+                    data-mma-action="world-champions"
+                    data-mma-label="CAMPEÕES"
+                >
                     CAMPEÕES
                 </button>
 
-                <button type="button">
+                <button
+                    type="button"
+                    data-mma-action="world-history"
+                    data-mma-label="HISTÓRIA"
+                >
                     HISTÓRIA
                 </button>
 
-                <button type="button">
+                <button
+                    type="button"
+                    data-mma-action="world-news"
+                    data-mma-label="NOTÍCIAS"
+                >
                     NOTÍCIAS
                 </button>
 
-                <button type="button">
+                <button
+                    type="button"
+                    data-mma-action="world-h2h"
+                    data-mma-label="HEAD TO HEAD"
+                >
                     HEAD TO HEAD
                 </button>
 
@@ -1536,6 +1551,35 @@ class Renderer {
             ]
         ];
 
+        const actionMap = {
+            relationships:
+                "life-relationships",
+
+            family:
+                "life-family",
+
+            children:
+                "life-children",
+
+            house:
+                "life-house",
+
+            vehicles:
+                "life-vehicles",
+
+            travel:
+                "life-travel",
+
+            education:
+                "life-education",
+
+            finance:
+                "life-finance",
+
+            academy:
+                "life-academy"
+        };
+
         items.forEach(
             ([title, icon]) => {
 
@@ -1546,6 +1590,12 @@ class Renderer {
                     );
 
                 card.type = "button";
+
+                card.dataset.mmaAction =
+                    actionMap[icon];
+
+                card.dataset.mmaLabel =
+                    title;
 
                 card.innerHTML = `
                     <span class="life-icon">
@@ -1923,7 +1973,8 @@ class Renderer {
             }
         ).join("");
     }
-        // =========================================================
+
+    // =========================================================
     // DADOS
     // =========================================================
 
@@ -2234,8 +2285,7 @@ class Renderer {
 
         return "Nenhum evento marcado";
     }
-
-    getNextEventDescription() {
+        getNextEventDescription() {
         const player =
             this.getPlayer();
 
@@ -2653,6 +2703,11 @@ class Renderer {
                 letter-spacing: 1px;
 
                 cursor: pointer;
+
+                position: relative;
+                z-index: 2;
+
+                pointer-events: auto;
             }
 
             .destiny-primary-button:disabled {
@@ -2689,6 +2744,11 @@ class Renderer {
                 letter-spacing: 1px;
 
                 cursor: pointer;
+
+                position: relative;
+                z-index: 2;
+
+                pointer-events: auto;
             }
 
             .destiny-quick-actions,
@@ -2786,6 +2846,11 @@ class Renderer {
                 font-weight: 700;
 
                 cursor: pointer;
+
+                position: relative;
+                z-index: 2;
+
+                pointer-events: auto;
             }
 
             /* ================================================
@@ -2827,6 +2892,11 @@ class Renderer {
                 color: inherit;
 
                 cursor: pointer;
+
+                position: relative;
+                z-index: 2;
+
+                pointer-events: auto;
             }
 
             .destiny-life-card
