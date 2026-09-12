@@ -1,4 +1,5 @@
 import { ROUTES } from "./router.js";
+import { getState } from "../core/state.js";
 
 class Renderer {
     constructor({ root, state, engine }) {
@@ -9,6 +10,355 @@ class Renderer {
         this.appContainer = null;
 
         this.injectRuntimeStyles();
+     // =========================================================
+    // SISTEMA DE INTERAÇÃO - MMA DESTINY
+    // =========================================================
+
+    bindInteractionSystem() {
+        if (this._interactionSystemBound) {
+            return;
+        }
+
+        this._interactionSystemBound = true;
+
+        document.addEventListener("click", (event) => {
+            const button = event.target.closest("button");
+
+            if (!button || button.disabled) {
+                return;
+            }
+
+            // BOTÕES DE CARREIRA
+            const careerActions = {
+                "TREINAMENTO": "training",
+                "CAMP": "camp",
+                "LUTAS": "fights",
+                "CONTRATOS": "contracts",
+                "RANKINGS": "rankings",
+                "HISTÓRICO": "history"
+            };
+
+            // BOTÕES DO MUNDO
+            const worldActions = {
+                "LUTADORES": "world-fighters",
+                "ORGANIZAÇÕES": "world-organizations",
+                "EVENTOS": "world-events",
+                "CAMPEÕES": "world-champions",
+                "HISTÓRIA": "world-history",
+                "NOTÍCIAS": "world-news",
+                "HEAD TO HEAD": "world-h2h"
+            };
+
+            // BOTÕES DA VIDA
+            const lifeActions = {
+                "RELACIONAMENTOS": "life-relationships",
+                "FAMÍLIA": "life-family",
+                "FILHOS": "life-children",
+                "CASA": "life-house",
+                "VEÍCULOS": "life-vehicles",
+                "VIAGENS": "life-travel",
+                "EDUCAÇÃO": "life-education",
+                "FINANÇAS": "life-finance",
+                "ACADEMIA": "life-academy"
+            };
+
+            const label =
+                button.textContent
+                    .trim()
+                    .replace(/\s+/g, " ");
+
+            const action =
+                careerActions[label] ||
+                worldActions[label] ||
+                lifeActions[label];
+
+            if (!action) {
+                return;
+            }
+
+            this.handleInternalAction(
+                action,
+                label,
+                button
+            );
+        });
+    }
+
+    handleInternalAction(
+        action,
+        label,
+        button
+    ) {
+        console.log(
+            "[MMA DESTINY] Ação:",
+            action
+        );
+
+        switch (action) {
+
+            case "training":
+                this.showActionFeedback(
+                    "TREINAMENTO",
+                    "Sistema de treinamento selecionado."
+                );
+                break;
+
+            case "camp":
+                this.showActionFeedback(
+                    "CAMP",
+                    "Sistema de camp selecionado."
+                );
+                break;
+
+            case "fights":
+                this.showActionFeedback(
+                    "LUTAS",
+                    "Sistema de lutas selecionado."
+                );
+                break;
+
+            case "contracts":
+                this.showActionFeedback(
+                    "CONTRATOS",
+                    "Sistema de contratos selecionado."
+                );
+                break;
+
+            case "history":
+                this.showActionFeedback(
+                    "HISTÓRICO",
+                    "Histórico da carreira selecionado."
+                );
+                break;
+
+            case "world-fighters":
+                this.showActionFeedback(
+                    "LUTADORES",
+                    "Banco de lutadores selecionado."
+                );
+                break;
+
+            case "world-organizations":
+                this.showActionFeedback(
+                    "ORGANIZAÇÕES",
+                    "Banco de organizações selecionado."
+                );
+                break;
+
+            case "world-events":
+                this.showActionFeedback(
+                    "EVENTOS",
+                    "Banco de eventos selecionado."
+                );
+                break;
+
+            case "world-champions":
+                this.showActionFeedback(
+                    "CAMPEÕES",
+                    "Banco de campeões selecionado."
+                );
+                break;
+
+            case "world-history":
+                this.showActionFeedback(
+                    "HISTÓRIA",
+                    "Histórico mundial selecionado."
+                );
+                break;
+
+            case "world-news":
+                this.showActionFeedback(
+                    "NOTÍCIAS",
+                    "Central de notícias selecionada."
+                );
+                break;
+
+            case "world-h2h":
+                this.showActionFeedback(
+                    "HEAD TO HEAD",
+                    "Comparador selecionado."
+                );
+                break;
+
+            case "life-relationships":
+            case "life-family":
+            case "life-children":
+            case "life-house":
+            case "life-vehicles":
+            case "life-travel":
+            case "life-education":
+            case "life-finance":
+            case "life-academy":
+
+                this.showActionFeedback(
+                    label,
+                    "Módulo selecionado."
+                );
+
+                break;
+
+            default:
+                console.warn(
+                    "[MMA DESTINY] Ação desconhecida:",
+                    action
+                );
+        }
+    }
+
+    showActionFeedback(
+        title,
+        message
+    ) {
+        const old =
+            document.querySelector(
+                "#mma-destiny-feedback"
+            );
+
+        if (old) {
+            old.remove();
+        }
+
+        const feedback =
+            document.createElement("div");
+
+        feedback.id =
+            "mma-destiny-feedback";
+
+        feedback.innerHTML = `
+            <strong>
+                ${this.safe(title)}
+            </strong>
+
+            <span>
+                ${this.safe(message)}
+            </span>
+        `;
+
+        Object.assign(
+            feedback.style,
+            {
+                position: "fixed",
+                left: "50%",
+                bottom: "100px",
+                transform:
+                    "translateX(-50%)",
+                zIndex: "10000",
+                padding: "12px 18px",
+                border:
+                    "1px solid rgba(255,255,255,.15)",
+                borderRadius: "10px",
+                background:
+                    "rgba(10,10,10,.95)",
+                color: "#fff",
+                display: "flex",
+                flexDirection: "column",
+                gap: "4px",
+                minWidth: "220px",
+                maxWidth:
+                    "calc(100vw - 40px)",
+                boxShadow:
+                    "0 12px 40px rgba(0,0,0,.45)",
+                textAlign: "center",
+                pointerEvents: "none"
+            }
+        );
+
+        document.body.appendChild(
+            feedback
+        );
+
+        setTimeout(() => {
+            feedback.remove();
+        }, 1800);
+    }
+
+    // =========================================================
+    // ESTADO REAL DO JOGO
+    // =========================================================
+
+    syncState() {
+        const currentState =
+            getState();
+
+        if (currentState) {
+            this.state =
+                currentState;
+        }
+
+        return this.state;
+    }
+
+    // =========================================================
+    // AVANÇAR SEMANA
+    // =========================================================
+
+    async advanceWeek(button) {
+
+        if (!this.engine) {
+            console.error(
+                "[MMA DESTINY] Engine não encontrado."
+            );
+            return;
+        }
+
+        if (
+            button &&
+            button.disabled
+        ) {
+            return;
+        }
+
+        if (button) {
+            button.disabled = true;
+            button.dataset.originalText =
+                button.textContent;
+
+            button.textContent =
+                "SIMULANDO...";
+        }
+
+        try {
+
+            await this.engine.advanceWeek();
+
+            this.syncState();
+
+            const route =
+                window.MMA_DESTINY?.router
+                    ?.getCurrentRoute();
+
+            if (route) {
+                this.renderRoute(route);
+            } else {
+                this.renderHome();
+            }
+
+        } catch (error) {
+
+            console.error(
+                "[MMA DESTINY] Erro ao avançar semana:",
+                error
+            );
+
+            alert(
+                "Não foi possível avançar a semana.\n\n" +
+                (
+                    error?.message ||
+                    "Erro desconhecido."
+                )
+            );
+
+        } finally {
+
+            if (button) {
+                button.disabled = false;
+
+                button.textContent =
+                    button.dataset.originalText ||
+                    "AVANÇAR SEMANA";
+            }
+        }
+    }
     }
 
     // =========================================================
