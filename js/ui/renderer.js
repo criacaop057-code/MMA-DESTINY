@@ -3,17 +3,18 @@ import { getState } from "../core/state.js";
 
 class Renderer {
     constructor({ root, state, engine }) {
-    this.root = root;
-    this.state = state || getState();
-    this.engine = engine;
+        this.root = root;
+        this.state = state || getState();
+        this.engine = engine;
 
-    this.appContainer = null;
+        this.appContainer = null;
 
-    this.injectRuntimeStyles();
+        this.injectRuntimeStyles();
 
-    this.bindInteractionSystem();
-}
-     // =========================================================
+        this.bindInteractionSystem();
+    }
+
+    // =========================================================
     // SISTEMA DE INTERAÇÃO - MMA DESTINY
     // =========================================================
 
@@ -31,7 +32,6 @@ class Renderer {
                 return;
             }
 
-            // BOTÕES DE CARREIRA
             const careerActions = {
                 "TREINAMENTO": "training",
                 "CAMP": "camp",
@@ -41,18 +41,17 @@ class Renderer {
                 "HISTÓRICO": "history"
             };
 
-            // BOTÕES DO MUNDO
             const worldActions = {
                 "LUTADORES": "world-fighters",
                 "ORGANIZAÇÕES": "world-organizations",
                 "EVENTOS": "world-events",
+                "RANKINGS": "world-rankings",
                 "CAMPEÕES": "world-champions",
                 "HISTÓRIA": "world-history",
                 "NOTÍCIAS": "world-news",
                 "HEAD TO HEAD": "world-h2h"
             };
 
-            // BOTÕES DA VIDA
             const lifeActions = {
                 "RELACIONAMENTOS": "life-relationships",
                 "FAMÍLIA": "life-family",
@@ -127,6 +126,13 @@ class Renderer {
                 );
                 break;
 
+            case "rankings":
+                this.showActionFeedback(
+                    "RANKINGS",
+                    "Rankings da carreira selecionados."
+                );
+                break;
+
             case "history":
                 this.showActionFeedback(
                     "HISTÓRICO",
@@ -152,6 +158,13 @@ class Renderer {
                 this.showActionFeedback(
                     "EVENTOS",
                     "Banco de eventos selecionado."
+                );
+                break;
+
+            case "world-rankings":
+                this.showActionFeedback(
+                    "RANKINGS",
+                    "Rankings mundiais selecionados."
                 );
                 break;
 
@@ -271,7 +284,9 @@ class Renderer {
         );
 
         setTimeout(() => {
-            feedback.remove();
+            if (feedback.parentNode) {
+                feedback.remove();
+            }
         }, 1800);
     }
 
@@ -313,6 +328,7 @@ class Renderer {
 
         if (button) {
             button.disabled = true;
+
             button.dataset.originalText =
                 button.textContent;
 
@@ -362,54 +378,88 @@ class Renderer {
             }
         }
     }
-    }
 
     // =========================================================
     // BASE
     // =========================================================
 
     ensureContainer() {
-        let container = document.querySelector("#app-content");
+        let container =
+            document.querySelector(
+                "#app-content"
+            );
 
         if (!container) {
-            container = document.querySelector("#mma-destiny-app");
+            container =
+                document.querySelector(
+                    "#mma-destiny-app"
+                );
         }
 
         if (!container) {
-            container = document.createElement("main");
-            container.id = "app-content";
-            this.root.appendChild(container);
+            container =
+                document.createElement(
+                    "main"
+                );
+
+            container.id =
+                "app-content";
+
+            this.root.appendChild(
+                container
+            );
         }
 
-        this.appContainer = container;
+        this.appContainer =
+            container;
     }
 
     clear() {
         this.ensureContainer();
+
         this.appContainer.innerHTML = "";
     }
 
-    el(tag, className = "", text = "") {
-        const element = document.createElement(tag);
+    el(
+        tag,
+        className = "",
+        text = ""
+    ) {
+        const element =
+            document.createElement(tag);
 
         if (className) {
-            element.className = className;
+            element.className =
+                className;
         }
 
         if (text !== "") {
-            element.textContent = text;
+            element.textContent =
+                text;
         }
 
         return element;
     }
 
-    button(text, className = "", action = null) {
-        const button = this.el("button", className, text);
+    button(
+        text,
+        className = "",
+        action = null
+    ) {
+        const button =
+            this.el(
+                "button",
+                className,
+                text
+            );
 
         button.type = "button";
 
         if (action) {
-            button.addEventListener("click", action);
+            button.addEventListener(
+                "click",
+                action
+            );
         }
 
         return button;
@@ -423,6 +473,7 @@ class Renderer {
         this.ensureContainer();
 
         switch (route) {
+
             case ROUTES.HOME:
                 this.renderHome();
                 break;
@@ -455,37 +506,49 @@ class Renderer {
     renderHome() {
         this.clear();
 
-        const player = this.getPlayer();
+        const player =
+            this.getPlayer();
 
-        const section = this.el(
-            "section",
-            "destiny-screen"
-        );
+        const section =
+            this.el(
+                "section",
+                "destiny-screen"
+            );
 
         // -----------------------------------------------------
         // HEADER
         // -----------------------------------------------------
 
-        const header = this.el(
-            "div",
-            "destiny-header"
-        );
+        const header =
+            this.el(
+                "div",
+                "destiny-header"
+            );
 
-        const brand = this.el(
-            "div",
-            "destiny-brand"
-        );
+        const brand =
+            this.el(
+                "div",
+                "destiny-brand"
+            );
 
         brand.innerHTML = `
-            <span class="destiny-brand-main">MMA</span>
-            <span class="destiny-brand-accent">DESTINY</span>
+            <span class="destiny-brand-main">
+                MMA
+            </span>
+
+            <span class="destiny-brand-accent">
+                DESTINY
+            </span>
         `;
 
-        const date = this.el(
-            "div",
-            "destiny-date",
-            this.formatDate(this.getGameDate())
-        );
+        const date =
+            this.el(
+                "div",
+                "destiny-date",
+                this.formatDate(
+                    this.getGameDate()
+                )
+            );
 
         header.append(
             brand,
@@ -496,24 +559,28 @@ class Renderer {
         // HERO
         // -----------------------------------------------------
 
-        const hero = this.el(
-            "div",
-            "destiny-hero"
-        );
+        const hero =
+            this.el(
+                "div",
+                "destiny-hero"
+            );
 
-        const heroTitle = this.el(
-            "h1",
-            "destiny-hero-title",
-            player?.name || "COMECE SUA HISTÓRIA"
-        );
+        const heroTitle =
+            this.el(
+                "h1",
+                "destiny-hero-title",
+                player?.name ||
+                "COMECE SUA HISTÓRIA"
+            );
 
-        const heroSubtitle = this.el(
-            "p",
-            "",
-            player
-                ? "Sua carreira. Sua vida. Seu legado."
-                : "O mundo do MMA está esperando por você."
-        );
+        const heroSubtitle =
+            this.el(
+                "p",
+                "",
+                player
+                    ? "Sua carreira. Sua vida. Seu legado."
+                    : "O mundo do MMA está esperando por você."
+            );
 
         hero.append(
             heroTitle,
@@ -525,10 +592,12 @@ class Renderer {
         // -----------------------------------------------------
 
         if (!player) {
-            const createButton = this.button(
-                "CRIAR LUTADOR",
-                "destiny-primary-button"
-            );
+
+            const createButton =
+                this.button(
+                    "CRIAR LUTADOR",
+                    "destiny-primary-button"
+                );
 
             createButton.addEventListener(
                 "click",
@@ -537,19 +606,23 @@ class Renderer {
                 }
             );
 
-            hero.appendChild(createButton);
+            hero.appendChild(
+                createButton
+            );
         }
 
         // -----------------------------------------------------
         // PERFIL
         // -----------------------------------------------------
 
-        const profileCard = this.el(
-            "div",
-            "destiny-card destiny-profile"
-        );
+        const profileCard =
+            this.el(
+                "div",
+                "destiny-card destiny-profile"
+            );
 
         if (player) {
+
             profileCard.innerHTML = `
                 <div class="destiny-card-label">
                     ATLETA
@@ -559,7 +632,9 @@ class Renderer {
 
                     <div class="fighter-avatar">
                         ${this.safe(
-                            this.getInitials(player.name)
+                            this.getInitials(
+                                player.name
+                            )
                         )}
                     </div>
 
@@ -567,7 +642,8 @@ class Renderer {
 
                         <h2>
                             ${this.safe(
-                                player.name || "Lutador"
+                                player.name ||
+                                "Lutador"
                             )}
                         </h2>
 
@@ -587,21 +663,27 @@ class Renderer {
                     <div>
                         <span>IDADE</span>
                         <strong>
-                            ${this.getPlayerAge(player)}
+                            ${this.getPlayerAge(
+                                player
+                            )}
                         </strong>
                     </div>
 
                     <div>
                         <span>OVR</span>
                         <strong>
-                            ${this.getOverall(player)}
+                            ${this.getOverall(
+                                player
+                            )}
                         </strong>
                     </div>
 
                     <div>
                         <span>RECORD</span>
                         <strong>
-                            ${this.getRecord(player)}
+                            ${this.getRecord(
+                                player
+                            )}
                         </strong>
                     </div>
 
@@ -609,14 +691,18 @@ class Renderer {
                         <span>CATEGORIA</span>
                         <strong>
                             ${this.safe(
-                                this.getWeightClass(player)
+                                this.getWeightClass(
+                                    player
+                                )
                             )}
                         </strong>
                     </div>
 
                 </div>
             `;
+
         } else {
+
             profileCard.innerHTML = `
                 <div class="destiny-card-label">
                     NOVA CARREIRA
@@ -657,21 +743,26 @@ class Renderer {
         // STATUS
         // -----------------------------------------------------
 
-        const statusGrid = this.el(
-            "div",
-            "destiny-status-grid"
-        );
+        const statusGrid =
+            this.el(
+                "div",
+                "destiny-status-grid"
+            );
 
         statusGrid.append(
             this.statCard(
                 "SAÚDE",
-                this.getHealth(player),
+                this.getHealth(
+                    player
+                ),
                 "%"
             ),
 
             this.statCard(
                 "FADIGA",
-                this.getFatigue(player),
+                this.getFatigue(
+                    player
+                ),
                 "%"
             ),
 
@@ -683,7 +774,9 @@ class Renderer {
 
             this.statCard(
                 "HYPE",
-                this.getHype(player),
+                this.getHype(
+                    player
+                ),
                 ""
             )
         );
@@ -692,10 +785,11 @@ class Renderer {
         // PRÓXIMO EVENTO
         // -----------------------------------------------------
 
-        const eventCard = this.el(
-            "div",
-            "destiny-card destiny-next-event"
-        );
+        const eventCard =
+            this.el(
+                "div",
+                "destiny-card destiny-next-event"
+            );
 
         eventCard.innerHTML = `
             <div class="destiny-card-label">
@@ -719,10 +813,11 @@ class Renderer {
         // AVANÇAR SEMANA
         // -----------------------------------------------------
 
-        const advanceButton = this.button(
-            "AVANÇAR SEMANA",
-            "destiny-primary-button"
-        );
+        const advanceButton =
+            this.button(
+                "AVANÇAR SEMANA",
+                "destiny-primary-button"
+            );
 
         advanceButton.addEventListener(
             "click",
@@ -737,10 +832,11 @@ class Renderer {
         // MENU RÁPIDO
         // -----------------------------------------------------
 
-        const quickActions = this.el(
-            "div",
-            "destiny-quick-actions"
-        );
+        const quickActions =
+            this.el(
+                "div",
+                "destiny-quick-actions"
+            );
 
         quickActions.append(
             this.quickButton(
@@ -788,15 +884,18 @@ class Renderer {
     // =========================================================
 
     openFighterCreation() {
-        const overlay = this.el(
-            "div",
-            "fighter-creation-overlay"
-        );
 
-        const modal = this.el(
-            "div",
-            "fighter-creation-modal"
-        );
+        const overlay =
+            this.el(
+                "div",
+                "fighter-creation-overlay"
+            );
+
+        const modal =
+            this.el(
+                "div",
+                "fighter-creation-modal"
+            );
 
         modal.innerHTML = `
             <div class="destiny-card-label">
@@ -815,6 +914,7 @@ class Renderer {
 
                 <label>
                     NOME
+
                     <input
                         id="creation-name"
                         type="text"
@@ -825,6 +925,7 @@ class Renderer {
 
                 <label>
                     APELIDO
+
                     <input
                         id="creation-nickname"
                         type="text"
@@ -835,7 +936,9 @@ class Renderer {
 
                 <label>
                     CATEGORIA
+
                     <select id="creation-weight">
+
                         <option value="strawweight">
                             Strawweight
                         </option>
@@ -852,7 +955,10 @@ class Renderer {
                             Featherweight
                         </option>
 
-                        <option value="lightweight" selected>
+                        <option
+                            value="lightweight"
+                            selected
+                        >
                             Lightweight
                         </option>
 
@@ -871,14 +977,19 @@ class Renderer {
                         <option value="heavyweight">
                             Heavyweight
                         </option>
+
                     </select>
                 </label>
 
                 <label>
                     ESTILO
+
                     <select id="creation-style">
 
-                        <option value="balanced" selected>
+                        <option
+                            value="balanced"
+                            selected
+                        >
                             Balanced
                         </option>
 
@@ -936,7 +1047,9 @@ class Renderer {
             </div>
         `;
 
-        overlay.appendChild(modal);
+        overlay.appendChild(
+            modal
+        );
 
         document.body.appendChild(
             overlay
@@ -1003,12 +1116,15 @@ class Renderer {
         }
 
         const player = {
-            id: `player_${Date.now()}`,
+
+            id:
+                `player_${Date.now()}`,
 
             name,
 
             nickname:
-                nickname || "Sem apelido",
+                nickname ||
+                "Sem apelido",
 
             age: 15,
 
@@ -1022,19 +1138,33 @@ class Renderer {
             style,
 
             attributes: {
+
                 striking: 50,
+
                 wrestling: 50,
+
                 grappling: 50,
+
                 bjj: 50,
+
                 takedownDefense: 50,
+
                 strikingDefense: 50,
+
                 cardio: 50,
+
                 strength: 50,
+
                 speed: 50,
+
                 durability: 50,
+
                 fightIQ: 50,
+
                 discipline: 50,
+
                 confidence: 50,
+
                 mental: 50
             },
 
@@ -1075,6 +1205,7 @@ class Renderer {
     }
 
     calculateBirthDateForAge15() {
+
         const current =
             new Date(
                 this.getGameDate()
@@ -1094,6 +1225,7 @@ class Renderer {
     // =========================================================
 
     renderCareer() {
+
         this.clear();
 
         const player =
@@ -1127,29 +1259,41 @@ class Renderer {
 
                 <div>
                     <span>OVR</span>
+
                     <strong>
-                        ${this.getOverall(player)}
+                        ${this.getOverall(
+                            player
+                        )}
                     </strong>
                 </div>
 
                 <div>
                     <span>POTENCIAL</span>
+
                     <strong>
-                        ${this.getPotential(player)}
+                        ${this.getPotential(
+                            player
+                        )}
                     </strong>
                 </div>
 
                 <div>
                     <span>RECORD</span>
+
                     <strong>
-                        ${this.getRecord(player)}
+                        ${this.getRecord(
+                            player
+                        )}
                     </strong>
                 </div>
 
                 <div>
                     <span>RANKING</span>
+
                     <strong>
-                        ${this.getRanking(player)}
+                        ${this.getRanking(
+                            player
+                        )}
                     </strong>
                 </div>
 
@@ -1187,6 +1331,7 @@ class Renderer {
             "HISTÓRICO"
         ].forEach(
             label => {
+
                 actions.append(
                     this.button(
                         label,
@@ -1212,6 +1357,7 @@ class Renderer {
     // =========================================================
 
     renderWorld() {
+
         this.clear();
 
         const section =
@@ -1230,6 +1376,7 @@ class Renderer {
             this.state.world || {};
 
         worldStats.append(
+
             this.statCard(
                 "LUTADORES",
                 this.count(
@@ -1326,6 +1473,7 @@ class Renderer {
     // =========================================================
 
     renderLife() {
+
         this.clear();
 
         const section =
@@ -1341,38 +1489,47 @@ class Renderer {
             );
 
         const items = [
+
             [
                 "RELACIONAMENTOS",
                 "relationships"
             ],
+
             [
                 "FAMÍLIA",
                 "family"
             ],
+
             [
                 "FILHOS",
                 "children"
             ],
+
             [
                 "CASA",
                 "house"
             ],
+
             [
                 "VEÍCULOS",
                 "vehicles"
             ],
+
             [
                 "VIAGENS",
                 "travel"
             ],
+
             [
                 "EDUCAÇÃO",
                 "education"
             ],
+
             [
                 "FINANÇAS",
                 "finance"
             ],
+
             [
                 "ACADEMIA",
                 "academy"
@@ -1392,7 +1549,9 @@ class Renderer {
 
                 card.innerHTML = `
                     <span class="life-icon">
-                        ${this.getLifeIcon(icon)}
+                        ${this.getLifeIcon(
+                            icon
+                        )}
                     </span>
 
                     <strong>
@@ -1424,6 +1583,7 @@ class Renderer {
     // =========================================================
 
     renderDynasty() {
+
         this.clear();
 
         const section =
@@ -1464,6 +1624,7 @@ class Renderer {
             );
 
         dynastyGrid.append(
+
             this.statCard(
                 "GERAÇÕES",
                 dynasty.generations || 1,
@@ -1625,11 +1786,13 @@ class Renderer {
                     window.MMA_DESTINY
                         ?.router
                 ) {
+
                     window.MMA_DESTINY
                         .router
-                        .navigate(route);
+                        .navigate(
+                            route
+                        );
                 }
-
             }
         );
 
@@ -1644,13 +1807,25 @@ class Renderer {
 
         const list = [
 
-            ["STRIKING", "striking"],
+            [
+                "STRIKING",
+                "striking"
+            ],
 
-            ["WRESTLING", "wrestling"],
+            [
+                "WRESTLING",
+                "wrestling"
+            ],
 
-            ["GRAPPLING", "grappling"],
+            [
+                "GRAPPLING",
+                "grappling"
+            ],
 
-            ["BJJ", "bjj"],
+            [
+                "BJJ",
+                "bjj"
+            ],
 
             [
                 "DEFESA DE QUEDAS",
@@ -1662,18 +1837,30 @@ class Renderer {
                 "strikingDefense"
             ],
 
-            ["CARDIO", "cardio"],
+            [
+                "CARDIO",
+                "cardio"
+            ],
 
-            ["FORÇA", "strength"],
+            [
+                "FORÇA",
+                "strength"
+            ],
 
-            ["VELOCIDADE", "speed"],
+            [
+                "VELOCIDADE",
+                "speed"
+            ],
 
             [
                 "DURABILIDADE",
                 "durability"
             ],
 
-            ["FIGHT IQ", "fightIQ"],
+            [
+                "FIGHT IQ",
+                "fightIQ"
+            ],
 
             [
                 "DISCIPLINA",
@@ -1685,8 +1872,10 @@ class Renderer {
                 "confidence"
             ],
 
-            ["MENTAL", "mental"]
-
+            [
+                "MENTAL",
+                "mental"
+            ]
         ];
 
         return list.map(
@@ -1734,74 +1923,7 @@ class Renderer {
             }
         ).join("");
     }
-
-    // =========================================================
-    // ENGINE
-    // =========================================================
-
-    async advanceWeek(
-        button
-    ) {
-        if (!this.engine) {
-            return;
-        }
-
-        if (button.disabled) {
-            return;
-        }
-
-        button.disabled = true;
-
-        button.textContent =
-            "SIMULANDO...";
-
-        try {
-
-            await this.engine
-                .advanceWeek();
-
-            this.syncState();
-
-            this.renderRoute(
-                window
-                    .MMA_DESTINY
-                    ?.router
-                    ?.getCurrentRoute()
-                ||
-                ROUTES.HOME
-            );
-
-        } catch (error) {
-
-            console.error(
-                "Erro ao avançar semana:",
-                error
-            );
-
-            alert(
-                "Não foi possível avançar a semana. Verifique o estado do jogo."
-            );
-
-            button.disabled =
-                false;
-
-            button.textContent =
-                "AVANÇAR SEMANA";
-        }
-    }
-
-    syncState() {
-        if (
-            this.engine?.state &&
-            this.engine.state !==
-                this.state
-        ) {
-            this.state =
-                this.engine.state;
-        }
-    }
-
-    // =========================================================
+        // =========================================================
     // DADOS
     // =========================================================
 
@@ -1820,12 +1942,10 @@ class Renderer {
 
         if (
             calendar &&
-            typeof calendar
-                .getCurrentDate ===
+            typeof calendar.getCurrentDate ===
                 "function"
         ) {
-            return calendar
-                .getCurrentDate();
+            return calendar.getCurrentDate();
         }
 
         return (
@@ -1856,9 +1976,7 @@ class Renderer {
         );
     }
 
-    getPlayerAge(
-        player
-    ) {
+    getPlayerAge(player) {
         if (!player) {
             return 15;
         }
@@ -1912,9 +2030,7 @@ class Renderer {
         return 15;
     }
 
-    getOverall(
-        player
-    ) {
+    getOverall(player) {
         if (!player) {
             return 0;
         }
@@ -1938,8 +2054,7 @@ class Renderer {
         }
 
         const attributes =
-            player.attributes ||
-            {};
+            player.attributes || {};
 
         const values =
             Object.values(
@@ -1950,9 +2065,7 @@ class Renderer {
                     "number"
             );
 
-        if (
-            !values.length
-        ) {
+        if (!values.length) {
             return 0;
         }
 
@@ -1969,9 +2082,7 @@ class Renderer {
         );
     }
 
-    getPotential(
-        player
-    ) {
+    getPotential(player) {
         if (!player) {
             return 0;
         }
@@ -1985,16 +2096,13 @@ class Renderer {
         );
     }
 
-    getRecord(
-        player
-    ) {
+    getRecord(player) {
         if (!player) {
             return "0-0-0";
         }
 
         const record =
-            player.record ||
-            {};
+            player.record || {};
 
         const wins =
             record.wins ??
@@ -2014,9 +2122,7 @@ class Renderer {
         return `${wins}-${losses}-${draws}`;
     }
 
-    getRanking(
-        player
-    ) {
+    getRanking(player) {
         if (!player) {
             return "—";
         }
@@ -2028,9 +2134,7 @@ class Renderer {
         );
     }
 
-    getWeightClass(
-        player
-    ) {
+    getWeightClass(player) {
         if (!player) {
             return "—";
         }
@@ -2042,9 +2146,7 @@ class Renderer {
         );
     }
 
-    getHealth(
-        player
-    ) {
+    getHealth(player) {
         if (!player) {
             return 100;
         }
@@ -2056,9 +2158,7 @@ class Renderer {
         );
     }
 
-    getFatigue(
-        player
-    ) {
+    getFatigue(player) {
         if (!player) {
             return 0;
         }
@@ -2070,9 +2170,7 @@ class Renderer {
         );
     }
 
-    getHype(
-        player
-    ) {
+    getHype(player) {
         if (!player) {
             return 0;
         }
@@ -2154,9 +2252,7 @@ class Renderer {
         return "Treine, desenvolva seus atributos e construa sua reputação.";
     }
 
-    getLegacyScore(
-        dynasty
-    ) {
+    getLegacyScore(dynasty) {
         if (!dynasty) {
             return 0;
         }
@@ -2195,9 +2291,7 @@ class Renderer {
         return 0;
     }
 
-    getInitials(
-        name
-    ) {
+    getInitials(name) {
         if (!name) {
             return "MD";
         }
@@ -2214,9 +2308,7 @@ class Renderer {
             .toUpperCase();
     }
 
-    getLifeIcon(
-        type
-    ) {
+    getLifeIcon(type) {
         const icons = {
 
             relationships: "♡",
@@ -2236,7 +2328,6 @@ class Renderer {
             finance: "$",
 
             academy: "♜"
-
         };
 
         return (
@@ -2276,6 +2367,7 @@ class Renderer {
     // =========================================================
 
     injectRuntimeStyles() {
+
         if (
             document.getElementById(
                 "mma-destiny-renderer-styles"
@@ -2399,6 +2491,7 @@ class Renderer {
 
             .destiny-card {
                 box-sizing: border-box;
+
                 border: 1px solid rgba(
                     255,
                     255,
@@ -2440,6 +2533,7 @@ class Renderer {
                 width: 58px;
                 height: 58px;
                 flex: 0 0 58px;
+
                 display: grid;
                 place-items: center;
 
@@ -2452,7 +2546,8 @@ class Renderer {
 
                 border-radius: 50%;
 
-                font-family: Rajdhani,
+                font-family:
+                    Rajdhani,
                     sans-serif;
 
                 font-size: 22px;
@@ -2461,8 +2556,11 @@ class Renderer {
 
             .fighter-info h2 {
                 margin: 0;
-                font-family: Rajdhani,
+
+                font-family:
+                    Rajdhani,
                     sans-serif;
+
                 font-size: 25px;
             }
 
@@ -2473,8 +2571,10 @@ class Renderer {
 
             .fighter-grid {
                 display: grid;
+
                 grid-template-columns:
                     repeat(4, 1fr);
+
                 gap: 10px;
                 margin-top: 20px;
             }
@@ -2495,6 +2595,7 @@ class Renderer {
             .fighter-grid span,
             .destiny-stat-card span {
                 display: block;
+
                 font-size: 9px;
                 letter-spacing: 1.5px;
                 opacity: .5;
@@ -2503,8 +2604,10 @@ class Renderer {
 
             .fighter-grid strong,
             .destiny-stat-card strong {
-                font-family: Rajdhani,
+                font-family:
+                    Rajdhani,
                     sans-serif;
+
                 font-size: 20px;
             }
 
@@ -2514,8 +2617,10 @@ class Renderer {
 
             .destiny-status-grid {
                 display: grid;
+
                 grid-template-columns:
                     repeat(4, 1fr);
+
                 gap: 10px;
                 margin-bottom: 14px;
             }
@@ -2539,7 +2644,8 @@ class Renderer {
                 background: #fff;
                 color: #000;
 
-                font-family: Rajdhani,
+                font-family:
+                    Rajdhani,
                     sans-serif;
 
                 font-size: 18px;
@@ -2575,7 +2681,8 @@ class Renderer {
 
                 color: inherit;
 
-                font-family: Rajdhani,
+                font-family:
+                    Rajdhani,
                     sans-serif;
 
                 font-weight: 700;
@@ -2587,8 +2694,10 @@ class Renderer {
             .destiny-quick-actions,
             .destiny-action-grid {
                 display: grid;
+
                 grid-template-columns:
                     repeat(4, 1fr);
+
                 gap: 10px;
             }
 
@@ -2608,25 +2717,31 @@ class Renderer {
             }
 
             .attribute-header strong {
-                font-family: Rajdhani,
+                font-family:
+                    Rajdhani,
                     sans-serif;
             }
 
             .attribute-track {
                 height: 5px;
+
                 border-radius: 10px;
+
                 background: rgba(
                     255,
                     255,
                     255,
                     .08
                 );
+
                 overflow: hidden;
             }
 
             .attribute-fill {
                 height: 100%;
+
                 background: currentColor;
+
                 border-radius: inherit;
             }
 
@@ -2636,8 +2751,10 @@ class Renderer {
 
             .destiny-database-menu {
                 display: grid;
+
                 grid-template-columns:
                     repeat(2, 1fr);
+
                 gap: 8px;
             }
 
@@ -2662,10 +2779,12 @@ class Renderer {
 
                 border-radius: 9px;
 
-                font-family: Rajdhani,
+                font-family:
+                    Rajdhani,
                     sans-serif;
 
                 font-weight: 700;
+
                 cursor: pointer;
             }
 
@@ -2675,14 +2794,18 @@ class Renderer {
 
             .destiny-life-grid {
                 display: grid;
+
                 grid-template-columns:
                     repeat(3, 1fr);
+
                 gap: 10px;
             }
 
             .destiny-life-card {
                 min-height: 110px;
+
                 padding: 15px;
+
                 text-align: left;
 
                 border: 1px solid rgba(
@@ -2702,6 +2825,7 @@ class Renderer {
                 );
 
                 color: inherit;
+
                 cursor: pointer;
             }
 
@@ -2714,14 +2838,19 @@ class Renderer {
 
             .destiny-life-card strong {
                 display: block;
-                font-family: Rajdhani,
+
+                font-family:
+                    Rajdhani,
                     sans-serif;
             }
 
             .destiny-life-card small {
                 display: block;
+
                 margin-top: 5px;
+
                 opacity: .4;
+
                 font-size: 9px;
             }
 
@@ -2730,7 +2859,8 @@ class Renderer {
             ================================================ */
 
             .legacy-score {
-                font-family: Rajdhani,
+                font-family:
+                    Rajdhani,
                     sans-serif;
 
                 font-size: 70px;
@@ -2739,13 +2869,18 @@ class Renderer {
 
             .genealogy-placeholder {
                 display: flex;
+
                 align-items: center;
                 justify-content: center;
+
                 gap: 15px;
+
                 flex-wrap: wrap;
+
                 text-align: center;
 
-                font-family: Rajdhani,
+                font-family:
+                    Rajdhani,
                     sans-serif;
 
                 font-weight: 700;
@@ -2757,15 +2892,20 @@ class Renderer {
 
             .creation-features {
                 display: grid;
+
                 grid-template-columns:
                     repeat(3, 1fr);
+
                 gap: 8px;
+
                 margin-top: 20px;
             }
 
             .creation-features div {
                 padding: 14px;
+
                 text-align: center;
+
                 border-radius: 10px;
 
                 background: rgba(
@@ -2778,25 +2918,34 @@ class Renderer {
 
             .creation-features strong {
                 display: block;
-                font-family: Rajdhani,
+
+                font-family:
+                    Rajdhani,
                     sans-serif;
+
                 font-size: 25px;
             }
 
             .creation-features span {
                 display: block;
+
                 margin-top: 4px;
+
                 font-size: 8px;
+
                 letter-spacing: 1px;
+
                 opacity: .5;
             }
 
             .fighter-creation-overlay {
                 position: fixed;
                 inset: 0;
+
                 z-index: 9999;
 
                 display: flex;
+
                 align-items: center;
                 justify-content: center;
 
@@ -2809,7 +2958,8 @@ class Renderer {
                     .82
                 );
 
-                backdrop-filter: blur(8px);
+                backdrop-filter:
+                    blur(8px);
             }
 
             .fighter-creation-modal {
@@ -2836,13 +2986,21 @@ class Renderer {
 
                 box-shadow:
                     0 20px 80px
-                    rgba(0,0,0,.7);
+                    rgba(
+                        0,
+                        0,
+                        0,
+                        .7
+                    );
             }
 
             .fighter-creation-modal h2 {
                 margin: 0;
-                font-family: Rajdhani,
+
+                font-family:
+                    Rajdhani,
                     sans-serif;
+
                 font-size: 32px;
             }
 
@@ -2853,23 +3011,30 @@ class Renderer {
 
             .creation-form {
                 display: grid;
+
                 gap: 14px;
+
                 margin-top: 20px;
             }
 
             .creation-form label {
                 display: grid;
+
                 gap: 7px;
 
                 font-size: 10px;
+
                 font-weight: 800;
+
                 letter-spacing: 1.5px;
+
                 opacity: .8;
             }
 
             .creation-form input,
             .creation-form select {
                 box-sizing: border-box;
+
                 width: 100%;
                 min-height: 48px;
 
@@ -2893,7 +3058,8 @@ class Renderer {
 
                 color: #fff;
 
-                font-family: Inter,
+                font-family:
+                    Inter,
                     sans-serif;
 
                 font-size: 14px;
@@ -2918,9 +3084,12 @@ class Renderer {
 
             .creation-actions {
                 display: grid;
+
                 grid-template-columns:
                     1fr 1fr;
+
                 gap: 10px;
+
                 margin-top: 20px;
             }
 
@@ -2962,7 +3131,6 @@ class Renderer {
                 .destiny-header {
                     margin-bottom: 24px;
                 }
-
             }
 
             @media (max-width: 420px) {
@@ -3011,9 +3179,7 @@ class Renderer {
                 .fighter-creation-modal {
                     padding: 18px;
                 }
-
             }
-
         `;
 
         document.head.appendChild(
@@ -3026,6 +3192,7 @@ class Renderer {
     // =========================================================
 
     refresh() {
+
         const route =
             window.MMA_DESTINY
                 ?.router
